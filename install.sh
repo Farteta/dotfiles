@@ -2,6 +2,8 @@
 
 set -e
 
+DOTFILES_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+
 echo "Installing dotfiles..."
 
 # Detect OS
@@ -16,21 +18,24 @@ fi
 
 echo "Detected OS: $OS"
 
+# Install dependencies if --deps flag is passed
+if [[ "$1" == "--deps" ]]; then
+    echo "Installing dependencies..."
+    "$DOTFILES_DIR/scripts/deps-$OS.sh"
+    echo ""
+fi
+
 # Check if stow is installed
 if ! command -v stow &> /dev/null; then
     echo "GNU Stow is not installed!"
-    if [[ "$OS" == "macos" ]]; then
-        echo "Install with: brew install stow"
-    else
-        echo "Install with: sudo apt install stow  (or your package manager)"
-    fi
+    echo "Run: ./install.sh --deps"
     exit 1
 fi
 
 # Stow common configs
 echo "Installing common configs..."
 cd ~/dotfiles/common
-stow -t ~ nvim zsh yazi
+stow -t ~ nvim zsh
 
 # Stow OS-specific configs
 echo "Installing $OS-specific configs..."
@@ -42,3 +47,5 @@ echo ""
 echo "Don't forget to:"
 echo "  - Restart your terminal (or run: source ~/.zshrc)"
 echo "  - Restart Neovim and Kitty"
+echo ""
+echo "Tip: Run './install.sh --deps' to install all dependencies"
