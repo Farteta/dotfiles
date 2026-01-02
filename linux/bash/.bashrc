@@ -10,10 +10,18 @@ esac
 # Path to the bash it configuration
 BASH_IT="$HOME/.bash_it"
 
-# Lock and Load a custom theme file.
-# Leave empty to disable theming.
-# location "$BASH_IT"/themes/
-export BASH_IT_THEME='bobby'
+# Check if bash-it is installed
+if [ ! -d "$BASH_IT" ]; then
+    echo "Warning: bash-it not installed. Run ./install-packages-proxmox-debian.sh first."
+    echo "Continuing with basic bash configuration..."
+    BASH_IT_INSTALLED=false
+else
+    BASH_IT_INSTALLED=true
+    # Lock and Load a custom theme file.
+    # Leave empty to disable theming.
+    # location "$BASH_IT"/themes/
+    export BASH_IT_THEME='bobby'
+fi
 
 # Some themes can show whether `sudo` has a current token or not.
 # Set `$THEME_CHECK_SUDO` to `true` to check every prompt:
@@ -72,8 +80,10 @@ TODO="t"
 # Uncomment this to make Bash-it create alias reload.
 # BASH_IT_RELOAD_LEGACY=1
 
-# Load Bash It
-source "${BASH_IT?}/bash_it.sh"
+# Load Bash It (if installed)
+if [ "$BASH_IT_INSTALLED" = true ]; then
+    source "$BASH_IT/bash_it.sh"
+fi
 
 # ============================================
 # CUSTOM CONFIGURATION (add at the end)
@@ -91,9 +101,11 @@ export PATH="$HOME/.local/bin:$PATH"
 export EDITOR="micro"
 export VISUAL="micro"
 
-# Starship prompt (replaces bash-it theme)
+# Starship prompt (replaces bash-it theme if both installed)
 if command -v starship &>/dev/null; then
-    export BASH_IT_THEME=''  # Disable bash-it theme
+    if [ "$BASH_IT_INSTALLED" = true ]; then
+        export BASH_IT_THEME=''  # Disable bash-it theme
+    fi
     eval "$(starship init bash)"
 fi
 
