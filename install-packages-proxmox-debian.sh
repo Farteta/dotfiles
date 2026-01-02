@@ -4,17 +4,20 @@ set -e
 echo "🚀 Setting up Linux environment..."
 
 # Update system
+echo "📦 Updating package lists..."
 apt update
 
 # Install essentials
 echo "📦 Installing essential packages..."
-apt install -y git curl micro bat fzf fastfetch
+apt install -y git curl micro bat fzf
 
 # Install bash-it
 if [ ! -d "$HOME/.bash_it" ]; then
     echo "🎨 Installing bash-it..."
     git clone --depth=1 https://github.com/Bash-it/bash-it.git ~/.bash_it
-    ~/.bash_it/install.sh --silent
+    cd ~/.bash_it
+    ./install.sh --silent
+    cd -
 fi
 
 # Install starship
@@ -31,10 +34,17 @@ fi
 
 # Copy bashrc
 echo "⚙️  Setting up bash configuration..."
-cp linux/bash/.bashrc ~/
+SCRIPT_DIR="$(cd "$(dirname "$0")" && pwd)"
+cp "$SCRIPT_DIR/linux/bash/.bashrc" ~/
 
 # Enable bash-it plugins
+echo "🔌 Enabling bash-it plugins..."
+export PATH="/usr/local/bin:$HOME/.local/bin:$PATH"
+source ~/.bashrc
 bash-it enable plugin git history
 bash-it enable completion git system
 
-echo "✅ Setup complete! Run 'source ~/.bashrc' to activate."
+echo ""
+echo "✅ Setup complete!"
+echo ""
+echo "Run 'source ~/.bashrc' or open a new terminal to activate."

@@ -1,82 +1,5 @@
-# shellcheck shell=bash
-# shellcheck disable=SC2034
-
-# If not running interactively, don't do anything
-case $- in
-	*i*) ;;
-	*) return ;;
-esac
-
-# Path to the bash it configuration
-BASH_IT="/root/.bash_it"
-
-# Lock and Load a custom theme file.
-# Leave empty to disable theming.
-# location "$BASH_IT"/themes/
-export BASH_IT_THEME='bobby'
-
-# Some themes can show whether `sudo` has a current token or not.
-# Set `$THEME_CHECK_SUDO` to `true` to check every prompt:
-#THEME_CHECK_SUDO='true'
-
-# (Advanced): Change this to the name of your remote repo if you
-# cloned bash-it with a remote other than origin such as `bash-it`.
-#BASH_IT_REMOTE='bash-it'
-
-# (Advanced): Change this to the name of the main development branch if
-# you renamed it or if it was changed for some reason
-#BASH_IT_DEVELOPMENT_BRANCH='master'
-
-# Your place for hosting Git repos. I use this for private repos.
-#GIT_HOSTING='git@git.domain.com'
-
-# Don't check mail when opening terminal.
-unset MAILCHECK
-
-# Change this to your console based IRC client of choice.
-export IRC_CLIENT='irssi'
-
-# Set this to the command you use for todo.txt-cli
-TODO="t"
-
-# Set this to the location of your work or project folders
-#BASH_IT_PROJECT_PATHS="${HOME}/Projects:/Volumes/work/src"
-
-# Set this to false to turn off version control status checking within the prompt for all themes
-#SCM_CHECK=true
-
-# Set to actual location of gitstatus directory if installed
-#SCM_GIT_GITSTATUS_DIR="$HOME/gitstatus"
-# per default gitstatus uses 2 times as many threads as CPU cores, you can change this here if you must
-#export GITSTATUS_NUM_THREADS=8
-
-# If your theme use command duration, uncomment this to
-# enable display of last command duration.
-#BASH_IT_COMMAND_DURATION=true
-# You can choose the minimum time in seconds before
-# command duration is displayed.
-#COMMAND_DURATION_MIN_SECONDS=1
-
-# Set Xterm/screen/Tmux title with shortened command and directory.
-# Uncomment this to set.
-#SHORT_TERM_LINE=true
-
-# Set vcprompt executable path for scm advance info in prompt (demula theme)
-# https://github.com/djl/vcprompt
-#VCPROMPT_EXECUTABLE=~/.vcprompt/bin/vcprompt
-
-# (Advanced): Uncomment this to make Bash-it reload itself automatically
-# after enabling or disabling aliases, plugins, and completions.
-# BASH_IT_AUTOMATIC_RELOAD_AFTER_CONFIG_CHANGE=1
-
-# Uncomment this to make Bash-it create alias reload.
-# BASH_IT_RELOAD_LEGACY=1
-
-# Load Bash It
-source "${BASH_IT?}/bash_it.sh"
-
 # ============================================
-# CUSTOM CONFIGURATION (add at the end)
+# CUSTOM CONFIGURATION
 # ============================================
 
 # Fix terminal type for SSH from Kitty
@@ -85,7 +8,7 @@ if [[ "$TERM" == "xterm-kitty" ]]; then
 fi
 
 # PATH
-export PATH="$HOME/.local/bin:$PATH"
+export PATH="/usr/local/bin:$HOME/.local/bin:$PATH"
 
 # Editor
 export EDITOR="micro"
@@ -97,56 +20,182 @@ if command -v starship &>/dev/null; then
     eval "$(starship init bash)"
 fi
 
-# Welcome message
+# Welcome message (comment out if annoying)
 command -v fastfetch &>/dev/null && fastfetch
 
-# Navigation aliases
+# ============================================
+# NAVIGATION & DIRECTORY ALIASES
+# ============================================
+
 alias ..='cd ..'
 alias ...='cd ../..'
 alias ....='cd ../../..'
 alias .....='cd ../../../..'
+alias ~='cd ~'
 
-# Quick access
-alias g='git'
+# ============================================
+# QUICK ACCESS
+# ============================================
+
 alias c='clear'
+alias h='history'
 alias bashconfig='micro ~/.bashrc'
 alias dotfiles='cd ~/dotfiles'
 
-# Better ls with eza
+# ============================================
+# BETTER CLI TOOLS
+# ============================================
+
+# Better ls with eza (fallback to regular ls)
 if command -v eza &>/dev/null; then
-    alias ls='eza --icons'
-    alias ll='eza -lah --icons --git'
+    alias ls='eza --icons --group-directories-first'
+    alias ll='eza -lah --icons --git --group-directories-first'
     alias lt='eza --tree --level=2 --icons'
-    alias la='eza -a --icons'
+    alias la='eza -a --icons --group-directories-first'
+    alias l='eza -lh --icons --git --group-directories-first'
 else
-    alias ls='ls --color=auto'
+    alias ls='ls --color=auto --group-directories-first'
     alias ll='ls -lah --color=auto'
     alias la='ls -a --color=auto'
+    alias l='ls -lh --color=auto'
 fi
 
 # Better cat with bat
 if command -v batcat &>/dev/null; then
     alias bat='batcat'
     alias cat='batcat --style=auto'
+    alias bathelp='batcat --plain --language=help'
+elif command -v bat &>/dev/null; then
+    alias cat='bat --style=auto'
+    alias bathelp='bat --plain --language=help'
 fi
 
-# Git aliases
+# Better help pages
+if command -v bat &>/dev/null || command -v batcat &>/dev/null; then
+    help() {
+        "$@" --help 2>&1 | bathelp
+    }
+fi
+
+# ============================================
+# GIT ALIASES
+# ============================================
+
+alias g='git'
 alias gs='git status'
 alias ga='git add'
+alias gaa='git add --all'
 alias gc='git commit'
+alias gcm='git commit -m'
 alias gp='git push'
-alias gl='git pull'
+alias gpl='git pull'
 alias gd='git diff'
-alias glog='git log --oneline --graph --decorate'
+alias gds='git diff --staged'
+alias glog='git log --oneline --graph --decorate --all'
+alias gco='git checkout'
+alias gb='git branch'
+alias gcl='git clone'
 
-# Directory jumping with zoxide
+# ============================================
+# SYSTEM & UTILITIES
+# ============================================
+
+# Disk usage
+alias df='df -h'
+alias du='du -h'
+
+# Quick editing
+alias v='micro'
+alias e='micro'
+
+# Network
+alias ports='netstat -tulanp'
+alias ping='ping -c 5'
+
+# Process management
+alias ps='ps auxf'
+alias psg='ps aux | grep -v grep | grep -i -e VSZ -e'
+
+# Safety nets
+alias rm='rm -i'
+alias cp='cp -i'
+alias mv='mv -i'
+
+# ============================================
+# DIRECTORY JUMPING & SEARCH
+# ============================================
+
+# zoxide - smart directory jumping
 if command -v zoxide &>/dev/null; then
     eval "$(zoxide init bash)"
     alias cd='z'
+    alias cdi='zi'  # Interactive selection
 fi
 
-# fzf fuzzy finder
-[ -f ~/.fzf.bash ] && source ~/.fzf.bash
+# fzf - fuzzy finder
+if [ -f ~/.fzf.bash ]; then
+    source ~/.fzf.bash
+    # Better defaults with preview
+    export FZF_DEFAULT_OPTS="--height 40% --layout=reverse --border --preview 'bat --color=always --style=numbers --line-range=:500 {} 2>/dev/null || cat {}'"
+fi
+
+# ============================================
+# DOCKER ALIASES (if you use Docker)
+# ============================================
+
+if command -v docker &>/dev/null; then
+    alias d='docker'
+    alias dc='docker compose'
+    alias dps='docker ps'
+    alias dpsa='docker ps -a'
+    alias di='docker images'
+    alias dlog='docker logs -f'
+    alias dex='docker exec -it'
+fi
+
+# ============================================
+# SYSTEM FUNCTIONS
+# ============================================
+
+# Make and enter directory
+mkcd() {
+    mkdir -p "$1" && cd "$1"
+}
+
+# Extract archives easily
+extract() {
+    if [ -f "$1" ]; then
+        case "$1" in
+            *.tar.bz2) tar xjf "$1" ;;
+            *.tar.gz) tar xzf "$1" ;;
+            *.bz2) bunzip2 "$1" ;;
+            *.rar) unrar x "$1" ;;
+            *.gz) gunzip "$1" ;;
+            *.tar) tar xf "$1" ;;
+            *.tbz2) tar xjf "$1" ;;
+            *.tgz) tar xzf "$1" ;;
+            *.zip) unzip "$1" ;;
+            *.Z) uncompress "$1" ;;
+            *.7z) 7z x "$1" ;;
+            *) echo "'$1' cannot be extracted" ;;
+        esac
+    else
+        echo "'$1' is not a valid file"
+    fi
+}
 
 # Quick reload
-alias reload='source ~/.bashrc'
+alias reload='source ~/.bashrc && echo "Bashrc reloaded!"'
+
+# ============================================
+# COMPLETION & HISTORY
+# ============================================
+
+# Better history
+export HISTCONTROL=ignoredups:erasedups
+export HISTSIZE=10000
+export HISTFILESIZE=10000
+shopt -s histappend
+
+# Update history after each command
+export PROMPT_COMMAND="history -a; history -n"
