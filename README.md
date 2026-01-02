@@ -32,7 +32,7 @@ Stow creates symlinks from each package to your home directory. For example, `co
 ### Fresh Machine
 
 ```bash
-git clone https://github.com/YOUR_USERNAME/dotfiles.git ~/dotfiles
+git clone https://github.com/Farteta/dotfiles.git ~/dotfiles
 cd ~/dotfiles
 ./install.sh --deps    # Install dependencies + symlink configs
 ```
