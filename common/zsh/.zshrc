@@ -1,9 +1,44 @@
 # PATH
-export PATH="$HOME/.local/bin:$PATH"
+export PATH="$HOME/.local/bin:/usr/local/bin:$PATH"
+
+# Fix terminal type for SSH from Kitty
+if [[ "$TERM" == "xterm-kitty" ]]; then
+    export TERM=xterm-256color
+fi
 
 # Editor
 export EDITOR="nvim"
 export VISUAL="nvim"
+
+# ============================================
+# KEYBOARD FIXES (for Linux terminals/SSH)
+# ============================================
+# Use emacs-style keybindings (default, but explicit)
+bindkey -e
+
+# Home/End keys
+bindkey '^[[H' beginning-of-line      # Home
+bindkey '^[[F' end-of-line            # End
+bindkey '^[[1~' beginning-of-line     # Home (alternate)
+bindkey '^[[4~' end-of-line           # End (alternate)
+bindkey '^[OH' beginning-of-line      # Home (xterm)
+bindkey '^[OF' end-of-line            # End (xterm)
+
+# Delete/Backspace
+bindkey '^[[3~' delete-char           # Delete
+bindkey '^?' backward-delete-char     # Backspace
+
+# Arrow keys for history search
+bindkey '^[[A' up-line-or-search      # Up
+bindkey '^[[B' down-line-or-search    # Down
+
+# Ctrl+Arrow for word navigation
+bindkey '^[[1;5C' forward-word        # Ctrl+Right
+bindkey '^[[1;5D' backward-word       # Ctrl+Left
+
+# Page Up/Down
+bindkey '^[[5~' up-line-or-history    # Page Up
+bindkey '^[[6~' down-line-or-history  # Page Down
 
 # Autosuggestions (gray inline hints)
 if [[ "$OSTYPE" == "darwin"* ]]; then
