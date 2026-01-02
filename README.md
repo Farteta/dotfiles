@@ -48,14 +48,22 @@ cd ~/dotfiles
 
 ### Proxmox/Debian LXC Containers
 
-For Debian-based LXC containers (uses bash instead of zsh):
+For Debian-based LXC containers:
 
 ```bash
-# As root
+# Bash (default)
+./install-packages-proxmox-debian.sh
+
+# Zsh (same as macOS config)
+./install-packages-proxmox-debian.sh --zsh
+```
+
+Full setup as root:
+
+```bash
 git clone https://github.com/Farteta/dotfiles.git ~/dotfiles
 cd ~/dotfiles
-./install-packages-proxmox-debian.sh
-source ~/.bashrc
+./install-packages-proxmox-debian.sh --zsh    # or without --zsh for bash
 ```
 
 For non-root users, first set up sudo:
@@ -69,11 +77,10 @@ usermod -aG sudo username
 su - username
 git clone https://github.com/Farteta/dotfiles.git ~/dotfiles
 cd ~/dotfiles
-./install-packages-proxmox-debian.sh
-source ~/.bashrc
+./install-packages-proxmox-debian.sh --zsh
 ```
 
-This installs bash-it, starship, eza, bat, zoxide, fastfetch, and configures the prompt.
+This installs starship, eza, bat, zoxide, fastfetch, and configures the shell.
 
 ## Tools
 

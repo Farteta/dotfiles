@@ -1,9 +1,28 @@
 #!/bin/bash
 set -e
 
-echo "Setting up Debian/Proxmox environment..."
+# ============================================
+# Parse arguments
+# ============================================
+USE_ZSH=false
+for arg in "$@"; do
+    case $arg in
+        --zsh)
+            USE_ZSH=true
+            shift
+            ;;
+    esac
+done
 
-# Detect if we need sudo
+if [ "$USE_ZSH" = true ]; then
+    echo "Setting up Debian/Proxmox environment (zsh)..."
+else
+    echo "Setting up Debian/Proxmox environment (bash)..."
+fi
+
+# ============================================
+# Detect sudo
+# ============================================
 if [ "$(id -u)" -eq 0 ]; then
     SUDO=""
 else
@@ -29,6 +48,9 @@ case "$ARCH" in
     *) echo "Unsupported architecture: $ARCH"; exit 1 ;;
 esac
 
+# ============================================
+# Install packages
+# ============================================
 echo ""
 echo "==> Updating package lists..."
 $SUDO apt update
@@ -37,13 +59,19 @@ echo ""
 echo "==> Installing essential packages..."
 $SUDO apt install -y git curl wget unzip micro bat fzf
 
-echo ""
-echo "==> Installing bash-it..."
-if [ ! -d "$HOME/.bash_it" ]; then
-    git clone --depth=1 https://github.com/Bash-it/bash-it.git ~/.bash_it
-    # Don't run install.sh as it overwrites bashrc - we have our own
+# Install zsh and plugins if --zsh flag
+if [ "$USE_ZSH" = true ]; then
+    echo ""
+    echo "==> Installing zsh and plugins..."
+    $SUDO apt install -y zsh zsh-autosuggestions zsh-syntax-highlighting
 else
-    echo "    bash-it already installed, skipping"
+    echo ""
+    echo "==> Installing bash-it..."
+    if [ ! -d "$HOME/.bash_it" ]; then
+        git clone --depth=1 https://github.com/Bash-it/bash-it.git ~/.bash_it
+    else
+        echo "    bash-it already installed, skipping"
+    fi
 fi
 
 echo ""
@@ -65,10 +93,7 @@ fi
 echo ""
 echo "==> Installing eza..."
 if ! command -v eza &>/dev/null; then
-    # eza is not in Debian repos, download from GitHub
     EZA_VERSION=$(curl -s https://api.github.com/repos/eza-community/eza/releases/latest | grep '"tag_name"' | cut -d'"' -f4)
-    EZA_VERSION_NUM="${EZA_VERSION#v}"  # Remove 'v' prefix
-
     wget -qO /tmp/eza.tar.gz "https://github.com/eza-community/eza/releases/download/${EZA_VERSION}/eza_${ARCH_TAR}-unknown-linux-gnu.tar.gz"
     tar -xzf /tmp/eza.tar.gz -C /tmp
     $SUDO mv /tmp/eza /usr/local/bin/
@@ -82,9 +107,7 @@ fi
 echo ""
 echo "==> Installing fastfetch..."
 if ! command -v fastfetch &>/dev/null; then
-    # fastfetch from GitHub releases
     FF_VERSION=$(curl -s https://api.github.com/repos/fastfetch-cli/fastfetch/releases/latest | grep '"tag_name"' | cut -d'"' -f4)
-
     wget -qO /tmp/fastfetch.deb "https://github.com/fastfetch-cli/fastfetch/releases/download/${FF_VERSION}/fastfetch-linux-${ARCH_DEB}.deb"
     $SUDO dpkg -i /tmp/fastfetch.deb || $SUDO apt install -f -y
     rm /tmp/fastfetch.deb
@@ -93,28 +116,48 @@ else
     echo "    fastfetch already installed, skipping"
 fi
 
-echo ""
-echo "==> Setting up bash configuration..."
-cp "$SCRIPT_DIR/linux/bash/.bashrc" ~/
-
+# ============================================
+# Setup shell configuration
+# ============================================
 echo ""
 echo "==> Setting up starship configuration..."
 mkdir -p ~/.config
 cp "$SCRIPT_DIR/common/starship/.config/starship.toml" ~/.config/
 
-echo ""
-echo "==> Enabling bash-it plugins..."
-# Source bash-it directly to enable plugins
-export BASH_IT="$HOME/.bash_it"
-export BASH_IT_THEME='bobby'
-source "$BASH_IT/bash_it.sh"
-bash-it enable plugin git history 2>/dev/null || true
-bash-it enable completion git system 2>/dev/null || true
+if [ "$USE_ZSH" = true ]; then
+    echo ""
+    echo "==> Setting up zsh configuration..."
+    cp "$SCRIPT_DIR/common/zsh/.zshrc" ~/
 
-echo ""
-echo "============================================"
-echo "Setup complete!"
-echo "============================================"
-echo ""
-echo "Run 'source ~/.bashrc' or open a new terminal to activate."
-echo ""
+    echo ""
+    echo "==> Changing default shell to zsh..."
+    $SUDO chsh -s /bin/zsh "$USER" 2>/dev/null || chsh -s /bin/zsh
+
+    echo ""
+    echo "============================================"
+    echo "Setup complete! (zsh)"
+    echo "============================================"
+    echo ""
+    echo "Run 'zsh' or open a new terminal to activate."
+    echo ""
+else
+    echo ""
+    echo "==> Setting up bash configuration..."
+    cp "$SCRIPT_DIR/linux/bash/.bashrc" ~/
+
+    echo ""
+    echo "==> Enabling bash-it plugins..."
+    export BASH_IT="$HOME/.bash_it"
+    export BASH_IT_THEME='bobby'
+    source "$BASH_IT/bash_it.sh"
+    bash-it enable plugin git history 2>/dev/null || true
+    bash-it enable completion git system 2>/dev/null || true
+
+    echo ""
+    echo "============================================"
+    echo "Setup complete! (bash)"
+    echo "============================================"
+    echo ""
+    echo "Run 'source ~/.bashrc' or open a new terminal to activate."
+    echo ""
+fi
