@@ -4,11 +4,11 @@ set -e
 echo "🚀 Setting up Linux environment..."
 
 # Update system
-sudo apt update
+apt update
 
 # Install essentials
 echo "📦 Installing essential packages..."
-sudo apt install -y git curl micro bat fzf fastfetch
+apt install -y git curl micro bat fzf fastfetch
 
 # Install bash-it
 if [ ! -d "$HOME/.bash_it" ]; then
