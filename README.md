@@ -14,15 +14,18 @@ My personal dotfiles for macOS and Linux, managed with [GNU Stow](https://www.gn
 dotfiles/
 ├── common/              # Cross-platform configs
 │   ├── nvim/            # Neovim (LazyVim)
-│   └── zsh/             # Zsh config
+│   ├── zsh/             # Zsh config
+│   └── starship/        # Starship prompt config
 ├── macos/               # macOS-specific
 │   └── kitty/           # Kitty with macOS settings
 ├── linux/               # Linux-specific
-│   └── kitty/           # Kitty without macOS settings
+│   ├── kitty/           # Kitty without macOS settings
+│   └── bash/            # Bash config (for Debian/Proxmox)
 ├── scripts/
 │   ├── deps-macos.sh    # Homebrew dependencies
 │   └── deps-linux.sh    # apt/dnf/pacman dependencies
-└── install.sh           # Main installer
+├── install.sh                       # Main installer (zsh, macOS/Linux desktop)
+└── install-packages-proxmox-debian.sh  # Debian/Proxmox LXC installer (bash)
 ```
 
 Stow creates symlinks from each package to your home directory. For example, `common/zsh/.zshrc` becomes `~/.zshrc`.
@@ -42,6 +45,35 @@ cd ~/dotfiles
 ```bash
 ./install.sh           # Just symlink configs
 ```
+
+### Proxmox/Debian LXC Containers
+
+For Debian-based LXC containers (uses bash instead of zsh):
+
+```bash
+# As root
+git clone https://github.com/Farteta/dotfiles.git ~/dotfiles
+cd ~/dotfiles
+./install-packages-proxmox-debian.sh
+source ~/.bashrc
+```
+
+For non-root users, first set up sudo:
+
+```bash
+# As root
+apt install sudo
+usermod -aG sudo username
+
+# Then as the user
+su - username
+git clone https://github.com/Farteta/dotfiles.git ~/dotfiles
+cd ~/dotfiles
+./install-packages-proxmox-debian.sh
+source ~/.bashrc
+```
+
+This installs bash-it, starship, eza, bat, zoxide, fastfetch, and configures the prompt.
 
 ## Tools
 
