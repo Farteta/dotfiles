@@ -8,7 +8,7 @@ case $- in
 esac
 
 # Path to the bash it configuration
-BASH_IT="/root/.bash_it"
+BASH_IT="$HOME/.bash_it"
 
 # Lock and Load a custom theme file.
 # Leave empty to disable theming.
