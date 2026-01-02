@@ -98,6 +98,11 @@ echo "==> Setting up bash configuration..."
 cp "$SCRIPT_DIR/linux/bash/.bashrc" ~/
 
 echo ""
+echo "==> Setting up starship configuration..."
+mkdir -p ~/.config
+cp "$SCRIPT_DIR/common/starship/.config/starship.toml" ~/.config/
+
+echo ""
 echo "==> Enabling bash-it plugins..."
 # Source bash-it directly to enable plugins
 export BASH_IT="$HOME/.bash_it"
