@@ -94,8 +94,8 @@ if [[ "$TERM" == "xterm-kitty" ]]; then
     export TERM=xterm-256color
 fi
 
-# PATH
-export PATH="$HOME/.local/bin:$PATH"
+# PATH - ensure local bins are available
+export PATH="$HOME/.local/bin:/usr/local/bin:$PATH"
 
 # Editor
 export EDITOR="micro"
