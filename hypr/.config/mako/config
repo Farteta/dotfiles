@@ -1,0 +1,5 @@
+default-timeout=5000
+ignore-timeout=0
+
+[urgency=critical]
+default-timeout=0
