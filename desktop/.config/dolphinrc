@@ -1,0 +1,19 @@
+[ExtractDialog]
+1920x1080 screen: Height=540
+1920x1080 screen: Width=1256
+DirHistory[$e]=$HOME/.local/share/fonts/,$HOME/.local/share/Steam/steamapps/compatdata/3551340/pfx/drive_c/users/steamuser/My Documents/Sports Interactive/Football Manager 26/graphics/
+
+[General]
+RememberOpenedTabs=false
+ShowSelectionToggle=false
+ShowStatusBar=Disabled
+ShowToolTips=false
+Version=202
+ViewPropsTimestamp=2025,11,17,20,53,47.768
+
+[KFileDialog Settings]
+Places Icons Auto-resize=false
+Places Icons Static Size=22
+
+[MainWindow]
+MenuBar=Disabled

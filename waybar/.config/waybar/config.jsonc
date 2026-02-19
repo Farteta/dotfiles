@@ -1,0 +1,99 @@
+{
+  "layer": "top",
+  "position": "top",
+  "height": 34,
+  "spacing": 8,
+  "modules-left": [
+    "hyprland/workspaces",
+    "tray"
+  ],
+  "modules-center": [
+    "hyprland/window"
+  ],
+  "modules-right": [
+    "custom/cliphist",
+    "pulseaudio",
+    "backlight",
+    "network",
+    "cpu",
+    "memory",
+    "custom/lock",
+    "clock"
+  ],
+  "hyprland/workspaces": {
+    "format": "{id}",
+    "show-special": true,
+    "all-outputs": true,
+    "sort-by": "number"
+  },
+  "hyprland/window": {
+    "format": "{class}",
+    "separate-outputs": true,
+    "max-length": 24,
+    "rewrite": {
+      "^org\\.kde\\.dolphin$": "Dolphin",
+      "^org\\.freedesktop\\.impl\\.portal\\.desktop\\.kde$": "File Picker",
+      "^org\\.kde\\.(.*)$": "$1"
+    }
+  },
+  "custom/cliphist": {
+    "format": "clip ",
+    "tooltip": false,
+    "on-click": "~/.config/waybar/scripts/cliphist-pick.sh"
+  },
+  "pulseaudio": {
+    "format": "{icon} {volume}%",
+    "format-muted": " 0%",
+    "format-icons": {
+      "headphone": "",
+      "hands-free": "",
+      "headset": "",
+      "phone": "",
+      "portable": "",
+      "car": "",
+      "default": [
+        "",
+        "",
+        ""
+      ]
+    },
+    "scroll-step": 5,
+    "on-click": "pavucontrol"
+  },
+  "backlight": {
+    "format": "light {percent}%",
+    "on-scroll-up": "brightnessctl -q set 5%+",
+    "on-scroll-down": "brightnessctl -q set 5%-"
+  },
+  "network": {
+    "format-wifi": "wifi {essid} {signalStrength}%",
+    "format-ethernet": "lan {ipaddr}",
+    "format-linked": "lan no-ip",
+    "format-disconnected": "net down",
+    "tooltip-format": "{ifname} via {gwaddr}",
+    "on-click": "nm-connection-editor"
+  },
+  "cpu": {
+    "format": "cpu  {usage}%",
+    "tooltip": false,
+    "on-click": "kitty -e btop"
+  },
+  "memory": {
+    "format": "ram  {}%",
+    "on-click": "kitty -e btop"
+  },
+  "clock": {
+    "format": "{:%a %d %b  %H:%M}",
+    "format-alt": "{:%Y-%m-%d %H:%M:%S}",
+    "tooltip-format": "<tt>{calendar}</tt>"
+  },
+  "tray": {
+    "icon-size": 18,
+    "spacing": 8
+  },
+  "custom/lock": {
+    "format": "lock ",
+    "tooltip": false,
+    "on-click": "loginctl lock-session"
+  }
+}
