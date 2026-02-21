@@ -66,6 +66,7 @@ button:hover {
 #pulseaudio,
 #backlight,
 #network,
+#custom-updates,
 #cpu,
 #memory,
 #tray,
@@ -81,4 +82,10 @@ button:hover {
 #network.disconnected {
   border-color: #d85b6a;
   color: #ffecec;
+}
+
+#custom-updates.pending {
+  border-color: rgba(120, 207, 166, 0.7);
+  color: #e7fff3;
+  background: rgba(120, 207, 166, 0.15);
 }

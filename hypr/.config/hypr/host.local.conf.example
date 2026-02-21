@@ -1,0 +1,11 @@
+# Host-specific Hyprland overrides.
+#
+# This file is copied to ~/.config/hypr/host.local.conf by bootstrap.sh.
+# Keep machine-specific settings there, not in hyprland.conf.
+#
+# Examples:
+# monitor=HDMI-A-1,3840x2160@60,0x0,2.0
+# monitor=DP-1,preferred,auto,1.5
+# input {
+#     kb_layout = se
+# }

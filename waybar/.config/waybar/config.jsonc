@@ -15,6 +15,7 @@
     "pulseaudio",
     "backlight",
     "network",
+    "custom/updates",
     "cpu",
     "memory",
     "custom/lock",
@@ -58,7 +59,7 @@
       ]
     },
     "scroll-step": 5,
-    "on-click": "pavucontrol"
+    "on-click": "~/.config/waybar/scripts/toggle-panel.sh volume"
   },
   "backlight": {
     "format": "light {percent}%",
@@ -71,7 +72,12 @@
     "format-linked": "lan no-ip",
     "format-disconnected": "net down",
     "tooltip-format": "{ifname} via {gwaddr}",
-    "on-click": "nm-connection-editor"
+    "on-click": "~/.config/waybar/scripts/toggle-panel.sh network"
+  },
+  "custom/updates": {
+    "exec": "~/.config/waybar/scripts/updates-count.sh",
+    "return-type": "json",
+    "interval": 900
   },
   "cpu": {
     "format": "cpu  {usage}%",
