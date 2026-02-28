@@ -1,0 +1,61 @@
+#!/usr/bin/env sh
+set -eu
+
+hash_file="${TMPDIR:-/tmp}/kitty-copy-feedback.hash"
+throttle_file="${TMPDIR:-/tmp}/kitty-copy-feedback.last"
+
+last_hash=""
+if [ -r "$hash_file" ]; then
+    last_hash="$(cat "$hash_file" 2>/dev/null || true)"
+fi
+
+if [ -z "$last_hash" ]; then
+    seed="$(pbpaste 2>/dev/null || true)"
+    last_hash="$(printf '%s' "$seed" | shasum -a 256 | awk '{print $1}')"
+    printf '%s\n' "$last_hash" > "$hash_file"
+fi
+
+frontmost_app() {
+    osascript -e 'tell application "System Events" to get name of first application process whose frontmost is true' 2>/dev/null || true
+}
+
+notify_clipboard_copy() {
+    now="$(date +%s)"
+    last=0
+
+    if [ -r "$throttle_file" ]; then
+        last="$(cat "$throttle_file" 2>/dev/null || printf '0')"
+    fi
+
+    case "$last" in
+        ''|*[!0-9]*) last=0 ;;
+    esac
+
+    if [ $((now - last)) -lt 1 ]; then
+        return 1
+    fi
+
+    printf '%s\n' "$now" > "$throttle_file"
+    osascript -e 'display notification "Selection copied" with title "Kitty"' >/dev/null 2>&1 || true
+}
+
+while :; do
+    text="$(pbpaste 2>/dev/null || true)"
+    hash="$(printf '%s' "$text" | shasum -a 256 | awk '{print $1}')"
+
+    if [ -n "$hash" ] && [ "$hash" != "$last_hash" ]; then
+        last_hash="$hash"
+        printf '%s\n' "$hash" > "$hash_file"
+
+        if [ -n "$text" ]; then
+            app="$(frontmost_app)"
+            case "$app" in
+                kitty|Kitty)
+                    notify_clipboard_copy || true
+                    ;;
+            esac
+        fi
+    fi
+
+    sleep 0.35
+done

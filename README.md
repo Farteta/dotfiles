@@ -1,6 +1,6 @@
 # dotfiles
 
-Personal Linux dotfiles for Hyprland + Waybar + Kitty + Zsh.
+Personal dotfiles for Linux (Hyprland + Waybar) and Kitty/Zsh, with macOS Kitty clipboard extras.
 
 ## Layout
 
@@ -8,6 +8,7 @@ Personal Linux dotfiles for Hyprland + Waybar + Kitty + Zsh.
 - `hypr/` -> Hyprland, hyprpaper, hyprlock, hypridle, mako, portal config
 - `waybar/` -> Waybar config, style, helper scripts
 - `kitty/` -> Kitty terminal config
+- `macos/` -> macOS-only helpers (LaunchAgent + clipboard feedback script)
 - `zsh/` -> Zsh and Powerlevel10k config
 - `pkglist.txt` -> package snapshot reference
 
@@ -27,6 +28,22 @@ cd ~/dotfiles
 cd ~/dotfiles
 stow -t ~ desktop hypr kitty waybar zsh
 ```
+
+### macOS extras
+
+```bash
+cd ~/dotfiles
+stow -t ~ macos
+launchctl bootstrap "gui/$(id -u)" "$HOME/Library/LaunchAgents/io.farteta.kitty-clipboard-feedback.plist"
+launchctl kickstart -k "gui/$(id -u)/io.farteta.kitty-clipboard-feedback"
+```
+
+### Kitty OS overrides
+
+`kitty.conf` loads per-OS overrides via `globinclude kitty.${KITTY_OS}.conf`.
+
+- Linux: `~/.config/kitty/kitty.linux.conf`
+- macOS: `~/.config/kitty/kitty.macos.conf`
 
 ## Host Overrides (Hyprland)
 

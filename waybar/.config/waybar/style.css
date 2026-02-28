@@ -11,12 +11,23 @@ window#waybar {
   border-radius: 11px;
 }
 
+tooltip {
+  background: rgba(26, 29, 36, 0.96);
+  border: 1px solid rgba(140, 150, 165, 0.45);
+  border-radius: 8px;
+}
+
+tooltip label {
+  color: #eef2f8;
+  padding: 4px 6px;
+}
+
 .modules-left {
-  margin-left: 8px;
+  margin-left: 6px;
 }
 
 .modules-right {
-  margin-right: 8px;
+  margin-right: 6px;
 }
 
 button {
@@ -29,17 +40,52 @@ button:hover {
 }
 
 #workspaces {
+  padding-left: 4px;
+  padding-right: 8px;
+}
+
+#workspaces,
+#tray,
+#custom-cliphist,
+#wireplumber,
+#backlight,
+#network,
+#custom-mpris,
+#privacy,
+#idle_inhibitor,
+#custom-tailscale,
+#custom-updates,
+#custom-cpu,
+#custom-gpu,
+#custom-memory,
+#clock {
   margin: 5px 0;
-  padding: 2px;
-  border-radius: 11px;
-  border: 1px solid rgba(255, 255, 255, 0.2);
-  background: rgba(255, 255, 255, 0.02);
+  padding: 0 8px;
+  border: none;
+  border-radius: 0;
+  background: transparent;
+}
+
+#workspaces,
+#custom-cliphist,
+#wireplumber,
+#tray,
+#backlight,
+#network,
+#privacy,
+#idle_inhibitor,
+#custom-tailscale,
+#custom-cpu,
+#custom-gpu,
+#custom-memory,
+#clock {
+  border-right: 1px solid rgba(255, 255, 255, 0.18);
 }
 
 #workspaces button {
-  margin: 0 2px;
-  padding: 0 10px;
-  border-radius: 8px;
+  margin: 0 1px;
+  padding: 0 7px;
+  border-radius: 0;
   color: #dddddd;
   background: transparent;
 }
@@ -56,36 +102,110 @@ button:hover {
 }
 
 #window {
-  margin: 0 10px;
+  margin: 0 8px;
   padding: 0;
   border: none;
   background: transparent;
 }
 
-#custom-cliphist,
-#pulseaudio,
-#backlight,
-#network,
-#custom-updates,
-#cpu,
-#memory,
-#tray,
-#custom-lock,
-#clock {
-  margin: 5px 0;
-  padding: 0 10px;
-  border-radius: 11px;
-  border: 1px solid rgba(255, 255, 255, 0.2);
-  background: rgba(255, 255, 255, 0.02);
-}
-
 #network.disconnected {
-  border-color: #d85b6a;
-  color: #ffecec;
+  color: #ffb0b8;
 }
 
 #custom-updates.pending {
-  border-color: rgba(120, 207, 166, 0.7);
-  color: #e7fff3;
-  background: rgba(120, 207, 166, 0.15);
+  color: #a2efcc;
+}
+
+#custom-cliphist.empty,
+#custom-cliphist.missing {
+  color: #9ba4af;
+}
+
+#custom-cliphist.overflow {
+  color: #f7dc98;
+}
+
+#custom-tailscale.connected {
+  color: #9ee6b9;
+}
+
+#custom-tailscale.degraded {
+  color: #f4d18b;
+}
+
+#custom-tailscale.offline {
+  color: #ff9da8;
+}
+
+#custom-tailscale.missing {
+  color: #9ba4af;
+}
+
+#idle_inhibitor.activated {
+  color: #a6e3a1;
+}
+
+#custom-mpris {
+  color: #d0d8ff;
+  font-weight: 600;
+}
+
+#custom-mpris.playing,
+#custom-mpris.paused {
+  border-right: 1px solid rgba(255, 255, 255, 0.18);
+}
+
+#custom-mpris.stopped {
+  padding-left: 0;
+  padding-right: 0;
+  border-right: none;
+  min-width: 0;
+}
+
+#idle_inhibitor {
+  font-weight: 600;
+}
+
+#idle_inhibitor.deactivated {
+  color: #ffb0b8;
+}
+
+#privacy-item.audio-in {
+  color: #ff9da8;
+}
+
+#privacy-item.audio-out {
+  color: #9bd5ff;
+}
+
+#privacy-item.screenshare {
+  color: #ffd88a;
+}
+
+#custom-cpu.cool,
+#custom-gpu.cool,
+#custom-memory.cool {
+  color: #c9e9ff;
+}
+
+#custom-cpu.warm,
+#custom-gpu.warm,
+#custom-memory.warm {
+  color: #f7dc98;
+}
+
+#custom-cpu.hot,
+#custom-gpu.hot,
+#custom-memory.hot {
+  color: #ffba7a;
+}
+
+#custom-cpu.critical,
+#custom-gpu.critical,
+#custom-memory.critical {
+  color: #ff8b8b;
+}
+
+#custom-gpu.offline {
+  color: #9ba4af;
 }

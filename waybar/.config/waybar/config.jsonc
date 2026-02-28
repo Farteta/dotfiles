@@ -2,24 +2,28 @@
   "layer": "top",
   "position": "top",
   "height": 34,
-  "spacing": 8,
+  "spacing": 4,
   "modules-left": [
     "hyprland/workspaces",
-    "tray"
+    "custom/cpu",
+    "custom/gpu",
+    "custom/memory",
+    "custom/cliphist",
+    "custom/mpris"
   ],
   "modules-center": [
     "hyprland/window"
   ],
   "modules-right": [
-    "custom/cliphist",
-    "pulseaudio",
+    "privacy",
     "backlight",
     "network",
-    "custom/updates",
-    "cpu",
-    "memory",
-    "custom/lock",
-    "clock"
+    "custom/tailscale",
+    "idle_inhibitor",
+    "wireplumber",
+    "tray",
+    "clock",
+    "custom/updates"
   ],
   "hyprland/workspaces": {
     "format": "{id}",
@@ -38,68 +42,130 @@
     }
   },
   "custom/cliphist": {
-    "format": "clip ",
-    "tooltip": false,
+    "exec": "~/.config/waybar/scripts/cliphist-status.sh",
+    "return-type": "json",
+    "interval": 2,
+    "tooltip": true,
     "on-click": "~/.config/waybar/scripts/cliphist-pick.sh"
   },
-  "pulseaudio": {
-    "format": "{icon} {volume}%",
-    "format-muted": " 0%",
-    "format-icons": {
-      "headphone": "",
-      "hands-free": "",
-      "headset": "",
-      "phone": "",
-      "portable": "",
-      "car": "",
-      "default": [
-        "",
-        "",
-        ""
-      ]
-    },
+  "wireplumber": {
+    "format": "<span size='130%'>{icon}</span> {volume}%",
+    "format-muted": "<span size='130%'></span> 0%",
+    "format-icons": [
+      "",
+      "",
+      ""
+    ],
+    "tooltip": true,
+    "tooltip-format": "{node_name}\n{volume}%",
     "scroll-step": 5,
     "on-click": "~/.config/waybar/scripts/toggle-panel.sh volume"
   },
   "backlight": {
     "format": "light {percent}%",
+    "tooltip": true,
+    "tooltip-format": "brightness {percent}%",
     "on-scroll-up": "brightnessctl -q set 5%+",
     "on-scroll-down": "brightnessctl -q set 5%-"
   },
+  "custom/mpris": {
+    "exec": "~/.config/waybar/scripts/mpris-scroll.sh 36 0.12 4 6",
+    "return-type": "json",
+    "tooltip": true,
+    "hide-empty-text": true,
+    "exec-on-event": false,
+    "max-length": 36,
+    "on-click": "playerctl play-pause",
+    "on-click-middle": "playerctl previous",
+    "on-click-right": "playerctl next"
+  },
+  "privacy": {
+    "icon-size": 18,
+    "icon-spacing": 5,
+    "transition-duration": 200,
+    "ignore-monitor": false,
+    "modules": [
+      {
+        "type": "screenshare",
+        "tooltip": true,
+        "tooltip-icon-size": 20
+      },
+      {
+        "type": "audio-in",
+        "tooltip": true,
+        "tooltip-icon-size": 20
+      },
+      {
+        "type": "audio-out",
+        "tooltip": true,
+        "tooltip-icon-size": 20
+      }
+    ]
+  },
+  "idle_inhibitor": {
+    "format": "idle {icon}",
+    "format-icons": {
+      "activated": "on ",
+      "deactivated": "off "
+    },
+    "tooltip-format-activated": "idle inhibit: on",
+    "tooltip-format-deactivated": "idle inhibit: off"
+  },
   "network": {
-    "format-wifi": "wifi {essid} {signalStrength}%",
-    "format-ethernet": "lan {ipaddr}",
-    "format-linked": "lan no-ip",
+    "interval": 2,
+    "tooltip": true,
+    "format-wifi": "net  ↓{bandwidthDownBits} ↑{bandwidthUpBits}",
+    "format-ethernet": "net  ↓{bandwidthDownBits} ↑{bandwidthUpBits}",
+    "format-linked": "lan linked",
     "format-disconnected": "net down",
-    "tooltip-format": "{ifname} via {gwaddr}",
+    "tooltip-format-wifi": "{ifname} {essid}\\n{ipaddr}\\n↓ {bandwidthDownBits}\\n↑ {bandwidthUpBits}",
+    "tooltip-format-ethernet": "{ifname} {ipaddr}\\n↓ {bandwidthDownBits}\\n↑ {bandwidthUpBits}",
+    "tooltip-format-disconnected": "disconnected",
+    "max-length": 34,
     "on-click": "~/.config/waybar/scripts/toggle-panel.sh network"
   },
   "custom/updates": {
     "exec": "~/.config/waybar/scripts/updates-count.sh",
     "return-type": "json",
+    "tooltip": true,
     "interval": 900
   },
-  "cpu": {
-    "format": "cpu  {usage}%",
-    "tooltip": false,
+  "custom/tailscale": {
+    "exec": "~/.config/waybar/scripts/tailscale-status.sh",
+    "return-type": "json",
+    "interval": 15,
+    "tooltip": true,
+    "on-click": "kitty -e tailscale status"
+  },
+  "custom/cpu": {
+    "exec": "~/.config/waybar/scripts/cpu-status.sh",
+    "return-type": "json",
+    "interval": 5,
+    "tooltip": true,
     "on-click": "kitty -e btop"
   },
-  "memory": {
-    "format": "ram  {}%",
+  "custom/gpu": {
+    "exec": "~/.config/waybar/scripts/gpu-status.sh",
+    "return-type": "json",
+    "interval": 5,
+    "tooltip": true,
+    "on-click": "kitty -e btop"
+  },
+  "custom/memory": {
+    "exec": "~/.config/waybar/scripts/memory-status.sh",
+    "return-type": "json",
+    "interval": 5,
+    "tooltip": true,
     "on-click": "kitty -e btop"
   },
   "clock": {
     "format": "{:%a %d %b  %H:%M}",
     "format-alt": "{:%Y-%m-%d %H:%M:%S}",
+    "tooltip": true,
     "tooltip-format": "<tt>{calendar}</tt>"
   },
   "tray": {
     "icon-size": 18,
-    "spacing": 8
-  },
-  "custom/lock": {
-    "format": "lock ",
-    "tooltip": false,
-    "on-click": "loginctl lock-session"
+    "spacing": 6
   }
 }
