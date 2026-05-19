@@ -6,3 +6,4 @@ export PATH="$HOME/.local/bin:$PATH"
 
 # Use Helium for CLI tools that respect $BROWSER
 export BROWSER="$HOME/.local/bin/helium"
+unsetopt correct correct_all
