@@ -2,7 +2,7 @@
 
 ## What this is
 
-Personal dotfiles for an Arch Linux desktop running Hyprland + Waybar + SDDM, with Kitty/Zsh and macOS extras. Managed with GNU Stow.
+Personal dotfiles for an Arch Linux desktop running Hyprland + Waybar + SDDM, with Kitty/Zsh. Managed with GNU Stow.
 
 ## Repo structure
 
@@ -10,10 +10,9 @@ Each top-level directory is a stow package mirroring `$HOME`:
 
 - `hypr/` - Hyprland, hyprpaper, hyprlock, hypridle, mako, xdg-portal configs + scripts
 - `waybar/` - Waybar config (jsonc), CSS, helper scripts
-- `kitty/` - Kitty terminal (loads per-OS overrides via `kitty.${KITTY_OS}.conf`)
+- `kitty/` - Kitty terminal with Linux-specific overrides
 - `zsh/` - `.zshrc` + Powerlevel10k config
 - `desktop/` - XDG mimeapps, KDE globals, Dolphin
-- `macos/` - macOS-only LaunchAgent + clipboard feedback
 - `starship/`, `nvim/`, `yazi/` - present but not yet wired into bootstrap
 
 Non-stow directories:
@@ -33,5 +32,5 @@ Non-stow directories:
 - **Scripts**: shell scripts live alongside their parent config (e.g. `waybar/.config/waybar/scripts/`, `hypr/.config/hypr/scripts/`). Mark executable.
 - **SDDM is special**: it targets system paths (`/usr/share/sddm/themes/`, `/etc/sddm.conf.d/`), so it uses a dedicated install script with `sudo`, not stow
 - **Host overrides**: machine-specific Hyprland config goes in `~/.config/hypr/host.local.conf` (not tracked in git)
-- **Commit style**: imperative, descriptive summaries (e.g. "Refine Waybar telemetry and clipboard UX across platforms")
-- **Target OS**: Arch Linux (pacman). macOS support is limited to Kitty clipboard extras.
+- **Commit style**: imperative, descriptive summaries (e.g. "Refine Waybar telemetry and clipboard UX")
+- **Target OS**: Arch Linux (pacman). macOS support lives in the separate `mac-dotfiles` repo.

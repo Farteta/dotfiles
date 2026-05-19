@@ -1,6 +1,6 @@
 # dotfiles
 
-Personal dotfiles for Linux (Hyprland + Waybar) and Kitty/Zsh, with macOS Kitty clipboard extras.
+Personal dotfiles for Arch Linux with Hyprland, Waybar, SDDM, Kitty, and Zsh.
 
 ## Layout
 
@@ -8,7 +8,6 @@ Personal dotfiles for Linux (Hyprland + Waybar) and Kitty/Zsh, with macOS Kitty 
 - `hypr/` -> Hyprland, hyprpaper, hyprlock, hypridle, mako, portal config
 - `waybar/` -> Waybar config, style, helper scripts
 - `kitty/` -> Kitty terminal config
-- `macos/` -> macOS-only helpers (LaunchAgent + clipboard feedback script)
 - `sddm/` -> Custom SDDM login theme (hypr-dark) + install script
 - `zsh/` -> Zsh and Powerlevel10k config
 - `pkglist.txt` -> package snapshot reference
@@ -32,21 +31,11 @@ cd ~/dotfiles
 stow -t ~ desktop hypr kitty waybar zsh
 ```
 
-### macOS extras
+### Kitty Linux overrides
 
-```bash
-cd ~/dotfiles
-stow -t ~ macos
-launchctl bootstrap "gui/$(id -u)" "$HOME/Library/LaunchAgents/io.farteta.kitty-clipboard-feedback.plist"
-launchctl kickstart -k "gui/$(id -u)/io.farteta.kitty-clipboard-feedback"
-```
+`kitty.conf` includes Linux-specific overrides from `~/.config/kitty/kitty.linux.conf`.
 
-### Kitty OS overrides
-
-`kitty.conf` loads per-OS overrides via `globinclude kitty.${KITTY_OS}.conf`.
-
-- Linux: `~/.config/kitty/kitty.linux.conf`
-- macOS: `~/.config/kitty/kitty.macos.conf`
+macOS dotfiles live in the separate `mac-dotfiles` repo.
 
 ### SDDM theme (hypr-dark)
 
