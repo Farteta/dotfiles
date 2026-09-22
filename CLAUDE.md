@@ -1,36 +1,67 @@
 # CLAUDE.md
 
-## What this is
+## Project
 
-Personal dotfiles for an Arch Linux desktop running Hyprland + Waybar + SDDM, with Kitty/Zsh. Managed with GNU Stow.
+Personal dotfiles for CachyOS (Arch-based), centered on Hyprland, Waybar,
+Rofi, Kitty, Zsh, and a custom SDDM login theme. GNU Stow manages the
+home-directory configuration. macOS dotfiles live in a separate repository.
 
-## Repo structure
+## Repository layout
 
-Each top-level directory is a stow package mirroring `$HOME`:
+- `hypr/`: Hyprland Lua config, hyprpaper, hyprlock, hypridle, Mako,
+  xdg-desktop-portal config, and helper scripts.
+- `waybar/`: bar config, CSS, and status/interaction scripts.
+- `rofi/`, `kitty/`, `zsh/`, `desktop/`: launcher, terminal, shell, and desktop
+  defaults. These are Stow packages alongside `hypr/` and `waybar/`.
+- `sddm/`: theme and installer; it writes system files and is **not** stowed.
+- `recovery/`: optional Btrfs/Snapper setup script; it is **not** stowed.
+- `starship/`, `nvim/`, `yazi/`: present but not currently included in the
+  bootstrap Stow package list.
+- `pkglist.txt`: package snapshot for reference, not the bootstrap package list.
 
-- `hypr/` - Hyprland, hyprpaper, hyprlock, hypridle, mako, xdg-portal configs + scripts
-- `waybar/` - Waybar config (jsonc), CSS, helper scripts
-- `kitty/` - Kitty terminal with Linux-specific overrides
-- `zsh/` - `.zshrc` + Powerlevel10k config
-- `desktop/` - XDG mimeapps, KDE globals, Dolphin
-- `starship/`, `nvim/`, `yazi/` - present but not yet wired into bootstrap
+## Hyprland
 
-Non-stow directories:
+`hypr/.config/hypr/hyprland.lua` is the active entry point. Its focused modules
+are under `hypr/.config/hypr/config/` (monitors, environment, autostart,
+plugins, appearance, layouts, input, bindings, and rules). The older
+`hyprland.conf` is kept as a rollback reference and is ignored while the Lua
+entry point exists. Do not make a change only in that legacy file.
 
-- `sddm/` - SDDM theme deployed via symlink (`sudo bash sddm/install.sh`), not stow
+The everyday LG C5 profile is in `config/monitors/lg_c5.lua`: 4K/144 Hz,
+scale 2, 8-bit SDR. The 10-bit/HDR script is for temporary experiments, not
+the default profile. Scrolling is the global layout; resize and groups are
+keyboard submaps. Keep Waybar's submap indicator in sync if changing them.
 
-## Key files
+Machine-local overrides belong in `~/.config/hypr/host.lua`, created from
+`hypr/.config/hypr/host.lua.example` by the bootstrap script. Do not commit
+the local override file.
 
-- `bootstrap.sh` - Full setup: packages (pacman), stow, SDDM deploy, host overrides, services
-- `sddm/install.sh` - Symlinks theme to `/usr/share/sddm/themes/`, installs fonts, writes config drop-in to `/etc/sddm.conf.d/zz-hypr-dark.conf`
-- `hypr/.config/hypr/host.local.conf.example` - Template for machine-specific overrides (monitors, input devices)
-- `pkglist.txt` - Package snapshot reference
+## Setup and recovery
 
-## Conventions
+`bootstrap.sh` installs packages, backs up conflicting Stow targets under
+`~/.local/state/dotfiles-backups/`, stows the six active packages, installs
+the SDDM theme, creates `host.lua` if absent, installs/enables the
+`hypr-edgehover` plugin through `hyprpm`, and enables services. It may invoke
+`sudo` and alter system state; do not run it just to test a small config edit.
+It supports `--no-packages`, `--no-services`, `--no-sddm`, and
+`--no-hypr-plugins`.
 
-- **Stow layout**: files go under `<package>/.config/<app>/` (or `<package>/.<file>` for home-level dotfiles like `.zshrc`)
-- **Scripts**: shell scripts live alongside their parent config (e.g. `waybar/.config/waybar/scripts/`, `hypr/.config/hypr/scripts/`). Mark executable.
-- **SDDM is special**: it targets system paths (`/usr/share/sddm/themes/`, `/etc/sddm.conf.d/`), so it uses a dedicated install script with `sudo`, not stow
-- **Host overrides**: machine-specific Hyprland config goes in `~/.config/hypr/host.local.conf` (not tracked in git)
-- **Commit style**: imperative, descriptive summaries (e.g. "Refine Waybar telemetry and clipboard UX")
-- **Target OS**: Arch Linux (pacman). macOS support lives in the separate `mac-dotfiles` repo.
+`sddm/install.sh` **copies** the theme to `/usr/share/sddm/themes/hypr-dark`,
+prepares a system-readable wallpaper and optional font, and writes
+`/etc/sddm.conf.d/zz-hypr-dark.conf`. It does not deploy a symlink.
+
+`recovery/setup-snapshots.sh` configures Snapper for the Btrfs root subvolume
+and enables timeline/cleanup timers. Root snapshots do not include the separate
+`/home` or `/boot` filesystems and are not an independent backup. Do not run a
+rollback or delete snapshots without identifying the exact target and impact.
+
+## Working conventions
+
+- Preserve existing user changes; inspect `git status` before editing.
+- Put scripts next to their parent config and mark executable when appropriate.
+- Match the shared Midnight Aurora palette across Hyprland, Waybar, Rofi,
+  Kitty, Mako, Hyprlock, and SDDM when changing colors.
+- For Hyprland Lua changes, syntax-check with `luac -p` and inspect live errors
+  with `hyprctl configerrors`. For shell scripts, use `bash -n` or `sh -n`.
+- Use imperative, descriptive Git commit summaries. Do not push or rewrite
+  history unless requested.

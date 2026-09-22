@@ -1,6 +1,7 @@
 # dotfiles
 
-Personal dotfiles for Arch Linux with Hyprland, Waybar, Rofi, SDDM, Kitty, and Zsh.
+Personal dotfiles for CachyOS (Arch-based) with Hyprland, Waybar, Rofi, SDDM,
+Kitty, and Zsh. The desktop uses a shared Midnight Aurora palette.
 
 ## Layout
 
@@ -11,9 +12,11 @@ Personal dotfiles for Arch Linux with Hyprland, Waybar, Rofi, SDDM, Kitty, and Z
 - `rofi/` -> Rofi application, command, and window launcher
 - `sddm/` -> Custom SDDM login theme (hypr-dark) + install script
 - `zsh/` -> Zsh and Powerlevel10k config
+- `recovery/` -> Optional Btrfs/Snapper setup (not stowed)
+- `starship/`, `nvim/`, `yazi/` -> Present, but not in the bootstrap Stow list
 - `pkglist.txt` -> package snapshot reference
 
-## Quick Start (Arch)
+## Quick Start (CachyOS / Arch)
 
 ```bash
 git clone https://github.com/Farteta/dotfiles.git ~/dotfiles
@@ -21,7 +24,11 @@ cd ~/dotfiles
 ./bootstrap.sh
 ```
 
-`bootstrap.sh` installs packages, backs up existing files that conflict with stow targets, stows configs, deploys the SDDM theme, creates a host override file for Hyprland, installs Hyprland plugins with `hyprpm`, and enables key services.
+`bootstrap.sh` installs packages, backs up existing files that conflict with
+Stow targets, stows configs, deploys the SDDM theme, creates a local Hyprland
+host override, installs `hypr-edgehover` with `hyprpm`, and enables key
+services. It uses `sudo` and changes system state; it is intended for setup or
+deliberate redeployment, not as a config syntax check.
 
 Existing conflicting files are moved under `~/.local/state/dotfiles-backups/bootstrap-*` before stow runs. Use `--no-packages`, `--no-services`, `--no-sddm`, or `--no-hypr-plugins` to skip those bootstrap phases.
 
@@ -54,7 +61,9 @@ What `sddm/install.sh` does:
 - installs JetBrainsMono Nerd Font into `/usr/local/share/fonts/JetBrainsMonoNerdFont` when it is available in the calling user's local font directory, so the `sddm` user can render the theme correctly
 - writes `/etc/sddm.conf.d/zz-hypr-dark.conf` to make `hypr-dark` the active theme and set the cursor/font defaults
 
-Edit `sddm/themes/hypr-dark/theme.conf` to change the wallpaper path or accent colour.
+Use `~/.config/hypr/scripts/set-wallpaper.sh /path/to/image` to change the
+current wallpaper and its SDDM copy. If you edit the SDDM theme itself, rerun
+`sudo ./sddm/install.sh` to copy the changes into the system theme directory.
 
 ## Hyprland Lua Configuration
 
@@ -78,6 +87,15 @@ that should not be committed to the dotfiles.
 Template location in repo:
 
 - `hypr/.config/hypr/host.lua.example`
+
+### Waybar
+
+The left side has clickable workspaces, grouped CPU/GPU/RAM status, and media
+only when a player is active. The active window stays centered. The right side
+holds contextual alerts, network/Tailscale, controls, tray, clock, and updates
+only when available. Detailed readings and actions live in tooltips or click
+handlers. Waybar remains the bar; a Quickshell control center is only a future
+idea, not part of this repository.
 
 ### Scrolling layout and keyboard modes
 
@@ -148,21 +166,31 @@ semantic roles consistent so states remain recognizable across the desktop.
 
 ```bash
 cd ~/dotfiles
+git status
 git pull --rebase
 ./bootstrap.sh
 ```
+
+Commit or otherwise preserve local edits before pulling. Use the bootstrap
+skip flags above if packages, services, SDDM, or Hyprland plugins do not need
+reinstallation. For a small config edit, check syntax and inspect
+`hyprctl configerrors` instead of rerunning the whole bootstrap.
 
 ## Recovery
 
 On a Btrfs installation, `sudo ./recovery/setup-snapshots.sh` creates a root
 Snapper configuration, a first read-only snapshot, and enables the timeline and
-cleanup timers. It keeps a small rolling history (2 hourly, 5 daily, 1 weekly)
-and leaves any existing root Snapper configuration untouched. Inspect snapshots
-with `sudo snapper -c root list` and timer status with
+cleanup timers. The timeline keeps up to 2 hourly, 5 daily, and 1 weekly
+snapshot. Snapshots created with the `number` cleanup algorithm have a separate
+limit of 10; manually created snapshots without a cleanup algorithm are not
+automatically pruned. These are retention counts, not a disk-space quota. The
+script leaves any existing root Snapper configuration untouched. Inspect
+snapshots with `sudo snapper -c root list` and timer status with
 `systemctl status snapper-timeline.timer snapper-cleanup.timer`.
 
 The root snapshot does **not** include the separate `/home` Btrfs subvolume or
 the `/boot` EFI partition. With systemd-boot, it is not an automatic boot-menu
 rollback. Keep an independent backup of personal files and a recovery USB;
 snapshots on the same SSD cannot protect against drive failure. The external
-backup destination is intentionally not configured by this script.
+USB backup is not configured yet; its destination will be chosen when the drive
+is connected. New dotfiles commits remain on this SSD until pushed.
