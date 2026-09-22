@@ -25,10 +25,23 @@ aur_count="$(printf '%s\n' "$aur_updates" | count_lines)"
 total_count=$((repo_count + aur_count))
 
 state="none"
+text=""
 if [ "$total_count" -gt 0 ]; then
   state="pending"
+  text="<span size='125%'>󰏗</span> ${total_count}"
 fi
 
-tooltip="repo: ${repo_count}\\naur: ${aur_count}\\ntotal: ${total_count}"
+package_preview="$(printf '%s\n%s\n' "$repo_updates" "$aur_updates" | awk '
+  NF {
+    count++
+    if (count <= 8) print
+  }
+  END {
+    if (count > 8) printf "… and %d more\n", count - 8
+  }
+')"
+tooltip="$(printf '%s updates available\nRepository: %s · AUR: %s\n\n%s' \
+  "$total_count" "$repo_count" "$aur_count" "$package_preview")"
 
-printf '{"text":"󰏗 %s","tooltip":"%s","class":"%s"}\n' "$total_count" "$tooltip" "$state"
+jq -nc --arg text "$text" --arg tooltip "$tooltip" --arg class "$state" \
+  '{text: $text, tooltip: $tooltip, class: $class}'

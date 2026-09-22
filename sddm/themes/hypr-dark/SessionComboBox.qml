@@ -15,6 +15,7 @@ FocusScope {
     property color menuBorderColor: Qt.rgba(1, 1, 1, 0.08)
 
     property int borderWidth: 1
+    property int cornerRadius: 18
     property font font
     property alias model: listView.model
     property int index: 0
@@ -44,7 +45,7 @@ FocusScope {
         color: container.color
         border.color: container.activeFocus ? container.focusColor : container.borderColor
         border.width: container.borderWidth
-        radius: 16
+        radius: container.cornerRadius
 
         Behavior on border.color { ColorAnimation { duration: 120 } }
     }
@@ -75,23 +76,21 @@ FocusScope {
             container.focus = true
             toggle()
         }
-        onWheel: {
-            if (wheel.angleDelta.y > 0)
-                listView.decrementCurrentIndex()
-            else
-                listView.incrementCurrentIndex()
-        }
     }
 
     Keys.onPressed: function(event) {
         if (event.key === Qt.Key_Up) {
-            listView.decrementCurrentIndex()
+            moveCurrentIndex(-1)
+            event.accepted = true
         } else if (event.key === Qt.Key_Down) {
-            listView.incrementCurrentIndex()
+            moveCurrentIndex(1)
+            event.accepted = true
         } else if (event.key === Qt.Key_Enter || event.key === Qt.Key_Return) {
             close(true)
+            event.accepted = true
         } else if (event.key === Qt.Key_Escape) {
             close(false)
+            event.accepted = true
         }
     }
 
@@ -104,7 +103,7 @@ FocusScope {
         color: container.menuColor
         border.color: container.menuBorderColor
         border.width: 1
-        radius: 16
+        radius: container.cornerRadius
         clip: true
         visible: height > 0
 
@@ -112,8 +111,10 @@ FocusScope {
             id: itemDelegate
 
             Rectangle {
+                property bool activeSession: index === container.index
                 width: dropDown.width
-                height: container.height
+                height: activeSession ? 0 : container.height
+                visible: !activeSession
                 color: ListView.isCurrentItem ? container.hoverColor : "transparent"
 
                 Loader {
@@ -150,7 +151,7 @@ FocusScope {
                 name: "visible"
                 PropertyChanges {
                     target: dropDown
-                    height: Math.min(listView.implicitHeight + 2, container.height * 6 + 2)
+                    height: container.dropDownHeight()
                 }
             }
         ]
@@ -168,19 +169,57 @@ FocusScope {
     }
 
     function open() {
+        if (selectableCount() === 0)
+            return
+
         dropDown.state = "visible"
-        listView.currentIndex = container.index
-        listView.positionViewAtIndex(container.index, ListView.Contain)
+        listView.currentIndex = firstSelectableIndex()
+        listView.positionViewAtIndex(listView.currentIndex, ListView.Contain)
     }
 
     function close(update) {
         dropDown.state = ""
 
-        if (update) {
+        if (update && listView.currentIndex !== container.index && listView.currentIndex >= 0) {
             container.index = listView.currentIndex
             if (listView.currentItem)
                 topRow.modelItem = listView.currentItem.modelItem
             valueChanged(listView.currentIndex)
+        } else {
+            listView.currentIndex = container.index
+        }
+    }
+
+    function selectableCount() {
+        return Math.max(0, listView.count - 1)
+    }
+
+    function dropDownHeight() {
+        if (selectableCount() === 0)
+            return 0
+        return Math.min(selectableCount() * container.height + 2, container.height * 6 + 2)
+    }
+
+    function firstSelectableIndex() {
+        for (var i = 0; i < listView.count; i++) {
+            if (i !== container.index)
+                return i
+        }
+        return container.index
+    }
+
+    function moveCurrentIndex(step) {
+        if (selectableCount() === 0)
+            return
+
+        var nextIndex = listView.currentIndex >= 0 ? listView.currentIndex : container.index
+        for (var i = 0; i < listView.count; i++) {
+            nextIndex = (nextIndex + step + listView.count) % listView.count
+            if (nextIndex !== container.index) {
+                listView.currentIndex = nextIndex
+                listView.positionViewAtIndex(nextIndex, ListView.Contain)
+                return
+            }
         }
     }
 

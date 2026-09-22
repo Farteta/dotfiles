@@ -1,5 +1,33 @@
+font=JetBrainsMono Nerd Font Mono 11
+background-color=#11141cee
+text-color=#e6eaf2ff
+border-color=#343b4aff
+progress-color=over #7dcfff33
+
+width=380
+height=140
+margin=12
+padding=14
+border-size=1
+border-radius=12
+icon-path=/usr/share/icons/breeze-dark:/usr/share/icons/hicolor
+max-icon-size=48
+icons=1
+markup=1
+actions=1
+anchor=top-right
+layer=overlay
 default-timeout=5000
 ignore-timeout=0
 
+[urgency=low]
+border-color=#343b4aff
+text-color=#929cadff
+
+[urgency=normal]
+border-color=#7dcfffaa
+
 [urgency=critical]
+border-color=#f7768eff
+background-color=#1b151eee
 default-timeout=0

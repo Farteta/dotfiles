@@ -9,14 +9,14 @@ Item {
     property bool loggingIn: false
 
     readonly property string fontFamily:   config.font        || "JetBrainsMono Nerd Font"
-    readonly property color accentBlue:    config.accentColor || "#87b8ff"
-    readonly property color bgOverlay:     "#10151f"
-    readonly property color textPrimary:   "#eeeeee"
+    readonly property color accentBlue:    config.accentColor || "#7dcfff"
+    readonly property color bgOverlay:     "#11141c"
+    readonly property color textPrimary:   "#e6eaf2"
     readonly property color textSecondary: Qt.rgba(1, 1, 1, 0.6)
     readonly property color textMuted:     Qt.rgba(1, 1, 1, 0.33)
-    readonly property color successGreen:  "#a6e3a1"
-    readonly property color errorRed:      "#f38ba8"
-    readonly property color inputBg:       Qt.rgba(16/255, 21/255, 31/255, 0.8)
+    readonly property color successGreen:  "#9ece6a"
+    readonly property color errorRed:      "#f7768e"
+    readonly property color inputBg:       Qt.rgba(17/255, 20/255, 28/255, 0.88)
     readonly property color chromeBg:      Qt.rgba(7/255, 10/255, 15/255, 0.34)
     readonly property color chromeBorder:  Qt.rgba(1, 1, 1, 0.08)
 
@@ -24,6 +24,15 @@ Item {
 
     // Primary screen geometry for UI positioning
     property var primaryScreen: screenModel.geometry(screenModel.primary)
+
+    readonly property int screenPadding: 28
+    readonly property int loginWidth: 364
+    readonly property int avatarSize: 92
+    readonly property int passwordHeight: 58
+    readonly property int loginBottomMargin: 52
+    readonly property int clockLift: 88
+    readonly property int controlRadius: 18
+    readonly property int footerWidth: 330
 
     // ── Background (per-screen) ─────────────────────────────────
     Repeater {
@@ -47,12 +56,13 @@ Item {
             anchors.fill: parent
             source: config.background
             fillMode: Image.PreserveAspectCrop
+            smooth: true
         }
 
         Rectangle {
             anchors.fill: parent
             color: root.bgOverlay
-            opacity: 0.82
+            opacity: 0.55
         }
 
         Rectangle {
@@ -69,14 +79,14 @@ Item {
     ColumnLayout {
         id: clockBlock
         x: primaryScreen.x + (primaryScreen.width - width) / 2
-        y: primaryScreen.y + (primaryScreen.height - height) / 2 - 88
+        y: primaryScreen.y + (primaryScreen.height - height) / 2 - root.clockLift
         spacing: 4
 
         Text {
             id: timeLabel
             Layout.alignment: Qt.AlignHCenter
             font.family: root.fontFamily
-            font.pixelSize: 102
+            font.pixelSize: 96
             font.weight: Font.Light
             color: Qt.rgba(1, 1, 1, 0.93)
             renderType: Text.CurveRendering
@@ -86,7 +96,7 @@ Item {
             id: dateLabel
             Layout.alignment: Qt.AlignHCenter
             font.family: root.fontFamily
-            font.pixelSize: 18
+            font.pixelSize: 16
             color: root.textSecondary
             renderType: Text.CurveRendering
         }
@@ -106,9 +116,8 @@ Item {
     Item {
         id: loginColumn
         x: primaryScreen.x + (primaryScreen.width - width) / 2
-        y: Math.max(primaryScreen.y + primaryScreen.height * 0.52,
-                    primaryScreen.y + primaryScreen.height - height - 72)
-        width: 364
+        y: primaryScreen.y + primaryScreen.height - height - root.loginBottomMargin
+        width: root.loginWidth
         height: cardColumn.implicitHeight
 
         Behavior on opacity { NumberAnimation { duration: 300 } }
@@ -121,15 +130,15 @@ Item {
 
             Item {
                 Layout.alignment: Qt.AlignHCenter
-                Layout.preferredWidth: 120
-                Layout.preferredHeight: 120
+                Layout.preferredWidth: root.avatarSize
+                Layout.preferredHeight: root.avatarSize
 
                 Rectangle {
                     id: avatarBorder
                     anchors.fill: parent
                     radius: width / 2
                     color: Qt.rgba(1, 1, 1, 0.04)
-                    border.width: 3
+                    border.width: 2
                     border.color: Qt.rgba(1, 1, 1, 0.4)
                 }
 
@@ -154,7 +163,7 @@ Item {
                     anchors.centerIn: parent
                     text: "\uf007"
                     font.family: root.fontFamily
-                    font.pixelSize: 48
+                    font.pixelSize: 38
                     color: root.textSecondary
                     visible: avatarSource.status !== Image.Ready
                 }
@@ -165,34 +174,40 @@ Item {
                 Layout.topMargin: 16
                 text: userModel.lastUser || "User"
                 font.family: root.fontFamily
-                font.pixelSize: 24
+                font.pixelSize: 20
                 font.weight: Font.Light
                 color: root.textPrimary
                 renderType: Text.CurveRendering
             }
 
-            Text {
+            Item {
                 Layout.alignment: Qt.AlignHCenter
                 Layout.topMargin: 8
-                text: root.loggingIn ? "Authenticating..." : ""
-                font.family: root.fontFamily
-                font.pixelSize: 12
-                color: root.textSecondary
-                visible: text !== ""
-                renderType: Text.CurveRendering
+                Layout.preferredWidth: root.loginWidth
+                Layout.preferredHeight: 14
+
+                Text {
+                    anchors.centerIn: parent
+                    text: root.loggingIn ? "Authenticating..." : ""
+                    font.family: root.fontFamily
+                    font.pixelSize: 12
+                    color: root.textSecondary
+                    visible: text !== ""
+                    renderType: Text.CurveRendering
+                }
             }
 
             Item {
                 Layout.alignment: Qt.AlignHCenter
                 Layout.topMargin: 22
-                Layout.preferredWidth: 364
-                Layout.preferredHeight: 58
+                Layout.preferredWidth: root.loginWidth
+                Layout.preferredHeight: root.passwordHeight
 
-                    Rectangle {
-                        id: inputRect
-                        anchors.fill: parent
-                        radius: 18
-                        color: root.inputBg
+                Rectangle {
+                    id: inputRect
+                    anchors.fill: parent
+                    radius: root.controlRadius
+                    color: root.inputBg
                     border.width: 2
                     border.color: {
                         if (root.notification === textConstants.loginFailed)
@@ -246,124 +261,135 @@ Item {
                 }
             }
 
-            Text {
+            Item {
                 Layout.alignment: Qt.AlignHCenter
                 Layout.topMargin: 14
-                text: root.notification
-                font.family: root.fontFamily
-                font.pixelSize: 12
-                color: root.notification === textConstants.loginSucceeded
-                       ? root.successGreen : root.errorRed
-                visible: root.notification !== ""
-                renderType: Text.CurveRendering
-            }
+                Layout.preferredWidth: root.loginWidth
+                Layout.preferredHeight: 42
 
-            Text {
-                Layout.alignment: Qt.AlignHCenter
-                Layout.topMargin: root.notification ? 6 : 12
-                text: "Press ESC to clear input"
-                font.family: root.fontFamily
-                font.pixelSize: 11
-                color: root.textMuted
-                visible: true
-                renderType: Text.CurveRendering
+                Text {
+                    id: notificationLabel
+                    anchors.horizontalCenter: parent.horizontalCenter
+                    anchors.top: parent.top
+                    text: root.notification
+                    font.family: root.fontFamily
+                    font.pixelSize: 12
+                    color: root.notification === textConstants.loginSucceeded
+                           ? root.successGreen : root.errorRed
+                    visible: root.notification !== ""
+                    renderType: Text.CurveRendering
+                }
+
+                Text {
+                    anchors.horizontalCenter: parent.horizontalCenter
+                    anchors.bottom: parent.bottom
+                    text: "Press ESC to clear input"
+                    font.family: root.fontFamily
+                    font.pixelSize: 11
+                    color: root.textMuted
+                    visible: true
+                    renderType: Text.CurveRendering
+                }
             }
 
         }
     }
 
-    // ── Power controls (top-right of primary) ───────────────────
-    Rectangle {
-        x: primaryScreen.x + primaryScreen.width - width - 24
-        y: primaryScreen.y + 24
-        width: powerRow.implicitWidth + 20
-        height: powerRow.implicitHeight + 12
-        radius: 24
-        color: root.chromeBg
-        border.width: 1
-        border.color: root.chromeBorder
+    // ── Footer controls (bottom-left of primary) ────────────────
+    Item {
+        id: footerControls
+        x: primaryScreen.x + root.screenPadding
+        y: primaryScreen.y + primaryScreen.height - height - root.screenPadding
+        width: root.footerWidth
+        height: footerColumn.implicitHeight
 
-        Row {
-            id: powerRow
-            anchors.centerIn: parent
+        Column {
+            id: footerColumn
             spacing: 10
 
-            PowerButton {
-                label: "Restart";  icon: "\uf0e2"
-                enabled: sddm.canReboot
-                onClicked: sddm.reboot()
-                fontFamily: root.fontFamily
-                accentColor: root.accentBlue
-                textColor: root.textSecondary
+            Rectangle {
+                id: sessionPanel
+                width: root.footerWidth
+                height: 44
+                radius: root.controlRadius
+                color: root.chromeBg
+                border.width: 1
+                border.color: root.chromeBorder
+
+                Row {
+                    id: sessionRow
+                    anchors.centerIn: parent
+                    spacing: 10
+
+                    Text {
+                        text: "\ue795"
+                        font.family: root.fontFamily
+                        font.pixelSize: 14
+                        color: root.textMuted
+                        anchors.verticalCenter: parent.verticalCenter
+                    }
+
+                    Text {
+                        text: "Session"
+                        font.family: root.fontFamily
+                        font.pixelSize: 12
+                        font.weight: Font.DemiBold
+                        color: root.textMuted
+                        anchors.verticalCenter: parent.verticalCenter
+                    }
+
+                    SessionComboBox {
+                        id: sessionSelect
+                        model: sessionModel
+                        index: sessionModel.lastIndex
+                        width: 200; height: 32
+                        font.family: root.fontFamily
+                        font.pixelSize: 12
+                        color: "transparent"
+                        textColor: root.textSecondary
+                        borderColor: "transparent"
+                        focusColor: root.accentBlue
+                        hoverColor: Qt.rgba(1, 1, 1, 0.08)
+                        menuColor: root.inputBg
+                        menuBorderColor: root.chromeBorder
+                    }
+                }
             }
 
-            PowerButton {
-                label: "Shut Down"; icon: "\uf011"
-                enabled: sddm.canPowerOff
-                onClicked: sddm.powerOff()
-                fontFamily: root.fontFamily
-                accentColor: root.accentBlue
-                textColor: root.textSecondary
-            }
+            Row {
+                id: powerRow
+                width: root.footerWidth
+                spacing: 8
 
-            PowerButton {
-                label: "Sleep"; icon: "\uf186"
-                enabled: sddm.canSuspend
-                onClicked: sddm.suspend()
-                fontFamily: root.fontFamily
-                accentColor: root.accentBlue
-                textColor: root.textSecondary
-            }
-        }
-    }
+                PowerButton {
+                    label: "Restart";  icon: "\uf0e2"
+                    preferredWidth: (root.footerWidth - powerRow.spacing * 2) / 3
+                    enabled: sddm.canReboot
+                    onClicked: sddm.reboot()
+                    fontFamily: root.fontFamily
+                    accentColor: root.accentBlue
+                    textColor: root.textSecondary
+                }
 
-    // ── Footer: session selector (bottom-left of primary) ───────
-    Rectangle {
-        x: primaryScreen.x + 24
-        y: primaryScreen.y + primaryScreen.height - height - 24
-        width: sessionRow.width + 28
-        height: 44
-        radius: 22
-        color: root.chromeBg
-        border.width: 1
-        border.color: root.chromeBorder
+                PowerButton {
+                    label: "Shut Down"; icon: "\uf011"
+                    preferredWidth: (root.footerWidth - powerRow.spacing * 2) / 3
+                    enabled: sddm.canPowerOff
+                    onClicked: sddm.powerOff()
+                    fontFamily: root.fontFamily
+                    accentColor: root.accentBlue
+                    textColor: root.textSecondary
+                }
 
-        Row {
-            id: sessionRow
-            anchors.centerIn: parent
-            spacing: 10
-
-            Text {
-                text: "\ue795"
-                font.family: root.fontFamily
-                font.pixelSize: 14
-                color: root.textMuted
-                anchors.verticalCenter: parent.verticalCenter
-            }
-
-            Text {
-                text: "Session"
-                font.family: root.fontFamily
-                font.pixelSize: 12
-                font.weight: Font.DemiBold
-                color: root.textMuted
-                anchors.verticalCenter: parent.verticalCenter
-            }
-
-            SessionComboBox {
-                id: sessionSelect
-                model: sessionModel
-                index: sessionModel.lastIndex
-                width: 200; height: 32
-                font.family: root.fontFamily
-                font.pixelSize: 13
-                color: "transparent"
-                textColor: root.textSecondary
-                borderColor: "transparent"
-                focusColor: root.accentBlue
-                hoverColor: Qt.rgba(1, 1, 1, 0.08)
-                menuColor: Qt.rgba(7/255, 10/255, 15/255, 0.96)
-                menuBorderColor: root.chromeBorder
+                PowerButton {
+                    label: "Sleep"; icon: "\uf186"
+                    preferredWidth: (root.footerWidth - powerRow.spacing * 2) / 3
+                    enabled: sddm.canSuspend
+                    onClicked: sddm.suspend()
+                    fontFamily: root.fontFamily
+                    accentColor: root.accentBlue
+                    textColor: root.textSecondary
+                }
             }
         }
     }

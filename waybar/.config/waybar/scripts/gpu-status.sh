@@ -19,7 +19,7 @@ gpu_temp_class() {
 }
 
 print_offline() {
-  printf '{"text":"gpu 󰢮 n/a","tooltip":"GPU stats unavailable","class":"offline"}\n'
+  printf '{"text":"<span size=\u0027125%%\u0027>󰢮</span> n/a","tooltip":"GPU stats unavailable","class":"offline"}\n'
 }
 
 emit_stats() {
@@ -28,7 +28,7 @@ emit_stats() {
   temp=$3
   class="$(gpu_temp_class "$temp")"
 
-  printf '{"text":"gpu 󰢮 %s%%  %s°C","tooltip":"%s\\nUsage: %s%%\\nTemp: %s°C","class":"%s"}\n' \
+  printf '{"text":"<span size=\u0027125%%\u0027>󰢮</span> %s%% %s°C","tooltip":"%s\\nUsage: %s%%\\nTemp: %s°C\\nClick: open btop","class":"%s"}\n' \
     "$usage" "$temp" "$gpu_name" "$usage" "$temp" "$class"
 }
 

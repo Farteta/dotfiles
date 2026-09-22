@@ -60,3 +60,4 @@ x-scheme-handler/file=org.kde.dolphin.desktop;
 application/xhtml+xml=helium.desktop
 application/xml=helium.desktop;
 text/xml=helium.desktop;
+x-scheme-handler/codex=chatgpt.desktop

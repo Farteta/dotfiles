@@ -2,7 +2,7 @@
 set -eu
 
 width="${1:-44}"
-delay="${2:-0.12}"
+delay="${2:-0.8}"
 poll_every="${3:-4}"
 pause_frames="${4:-6}"
 gap='     '
@@ -90,7 +90,7 @@ scroll_text() {
 }
 
 if ! command -v playerctl >/dev/null 2>&1; then
-  printf '{"text":"mpris n/a","tooltip":"playerctl not installed","class":"stopped"}\n'
+  printf '{"text":"","tooltip":"playerctl not installed","class":"stopped"}\n'
   exit 0
 fi
 
@@ -99,6 +99,7 @@ pause_left=0
 poll_left=0
 cached_line=''
 last_key=''
+last_json=''
 
 while :; do
   if [ "$poll_left" -le 0 ]; then
@@ -110,7 +111,11 @@ while :; do
   line="$cached_line"
 
   if [ -z "$line" ]; then
-    printf '{"text":"","tooltip":"No active media player","class":"stopped"}\n'
+    output='{"text":"","tooltip":"No active media player","class":"stopped"}'
+    if [ "$output" != "$last_json" ]; then
+      printf '%s\n' "$output"
+      last_json="$output"
+    fi
     offset=0
     pause_left=0
     last_key=''
@@ -137,9 +142,9 @@ while :; do
     last_key="$key"
   fi
 
-  full="$(status_icon "$status") $(player_icon "$player") $dynamic"
-  scroll_source="$full$gap"
-  full_len="$(printf '%s' "$full" | awk '{ print length }')"
+  media_icons="$(status_icon "$status") $(player_icon "$player")"
+  scroll_source="$dynamic$gap"
+  full_len="$(printf '%s' "$dynamic" | awk '{ print length }')"
 
   if [ "$full_len" -gt "$width" ]; then
     display="$(scroll_text "$scroll_source" "$offset" "$width")"
@@ -148,7 +153,7 @@ while :; do
     if [ "$pause_left" -gt 0 ]; then
       pause_left=$((pause_left - 1))
     else
-      offset=$((offset + 1))
+      offset=$((offset + 2))
       if [ "$offset" -ge "$scroll_len" ]; then
         offset=0
         pause_left="$pause_frames"
@@ -157,8 +162,10 @@ while :; do
   else
     offset=0
     pause_left=0
-    display="$full"
+    display="$dynamic"
   fi
+
+  display="<span size='120%'>$media_icons</span> $display"
 
   class='stopped'
   case "$status" in
@@ -176,7 +183,12 @@ while :; do
   if [ -n "$artist_safe" ]; then
     tooltip="$tooltip\\n$artist_safe"
   fi
+  tooltip="$tooltip\\n\\nClick: play/pause · Middle click: previous · Right click: next"
 
-  printf '{"text":"%s","tooltip":"%s","class":"%s"}\n' "$text_safe" "$tooltip" "$class"
+  output="$(printf '{"text":"%s","tooltip":"%s","class":"%s"}' "$text_safe" "$tooltip" "$class")"
+  if [ "$output" != "$last_json" ]; then
+    printf '%s\n' "$output"
+    last_json="$output"
+  fi
   sleep "$delay"
 done

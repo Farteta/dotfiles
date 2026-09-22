@@ -1,211 +1,197 @@
+@define-color bg rgba(17, 20, 28, 0.90);
+@define-color surface rgba(25, 29, 39, 0.94);
+@define-color surface_hover rgba(35, 41, 54, 0.96);
+@define-color border rgba(83, 94, 117, 0.45);
+@define-color foreground #e6eaf2;
+@define-color muted #929cad;
+@define-color accent #7dcfff;
+@define-color accent_soft rgba(125, 207, 255, 0.16);
+@define-color green #9ece6a;
+@define-color yellow #e0af68;
+@define-color orange #ff9e64;
+@define-color red #f7768e;
+@define-color divider rgba(146, 156, 173, 0.22);
+
 * {
-  font-family: "JetBrainsMono Nerd Font Mono", "JetBrainsMono Nerd Font", "JetBrainsMono", monospace;
-  font-size: 12px;
-  color: #e1e1e1;
   min-height: 0;
+  border: none;
+  border-radius: 0;
+  font-family: "JetBrainsMono Nerd Font Mono", "JetBrainsMono Nerd Font", monospace;
+  font-size: 12px;
+  font-weight: 500;
 }
 
 window#waybar {
-  background: rgba(38, 43, 52, 0.85);
-  border: 1px solid #000000;
-  border-radius: 11px;
+  color: @foreground;
+  background-color: transparent;
+  background-image: linear-gradient(
+    to bottom,
+    rgba(17, 20, 28, 0.88) 0%,
+    rgba(17, 20, 28, 0.56) 55%,
+    rgba(17, 20, 28, 0.08) 100%
+  );
 }
 
-tooltip {
-  background: rgba(26, 29, 36, 0.96);
-  border: 1px solid rgba(140, 150, 165, 0.45);
-  border-radius: 8px;
-}
-
-tooltip label {
-  color: #eef2f8;
-  padding: 4px 6px;
-}
-
-.modules-left {
-  margin-left: 6px;
-}
-
+.modules-left,
+.modules-center,
 .modules-right {
-  margin-right: 6px;
-}
-
-button {
-  border: none;
-  box-shadow: none;
-}
-
-button:hover {
-  background: rgba(255, 255, 255, 0.05);
-}
-
-#workspaces {
-  padding-left: 4px;
-  padding-right: 8px;
-}
-
-#workspaces,
-#tray,
-#custom-cliphist,
-#wireplumber,
-#backlight,
-#network,
-#custom-mpris,
-#privacy,
-#idle_inhibitor,
-#custom-tailscale,
-#custom-updates,
-#custom-cpu,
-#custom-gpu,
-#custom-memory,
-#clock {
-  margin: 5px 0;
-  padding: 0 8px;
+  margin: 0;
+  padding: 0;
   border: none;
   border-radius: 0;
   background: transparent;
+  box-shadow: none;
 }
 
-#workspaces,
-#custom-cliphist,
-#wireplumber,
-#tray,
-#backlight,
-#network,
-#privacy,
-#idle_inhibitor,
-#custom-tailscale,
-#custom-cpu,
-#custom-gpu,
-#custom-memory,
-#clock {
-  border-right: 1px solid rgba(255, 255, 255, 0.18);
+.modules-left { margin-left: 6px; }
+.modules-right { margin-right: 6px; }
+
+tooltip {
+  border: 1px solid @border;
+  border-radius: 11px;
+  background-color: #191d27;
+}
+
+tooltip label {
+  padding: 6px 8px;
+  color: @foreground;
+  background-color: transparent;
+}
+
+button {
+  box-shadow: none;
+  text-shadow: none;
+}
+
+button:hover { background: @surface_hover; }
+
+#workspaces {
+  margin: 0;
+  padding: 0 5px 0 1px;
+  border-right: 1px solid @divider;
 }
 
 #workspaces button {
+  min-width: 24px;
   margin: 0 1px;
-  padding: 0 7px;
+  padding: 0 6px;
   border-radius: 0;
-  color: #dddddd;
+  color: @muted;
+  background: transparent;
+  transition: all 180ms ease;
+}
+
+#workspaces button:hover {
+  color: @foreground;
   background: transparent;
 }
 
 #workspaces button.active,
 #workspaces button.focused {
-  color: #ffffff;
-  background: rgba(255, 255, 255, 0.08);
+  color: @accent;
+  background: transparent;
+  font-weight: 800;
 }
 
 #workspaces button.urgent {
-  color: #ffecec;
-  background: rgba(216, 91, 106, 0.35);
-}
-
-#window {
-  margin: 0 8px;
-  padding: 0;
-  border: none;
+  color: @red;
   background: transparent;
 }
 
-#network.disconnected {
-  color: #ffb0b8;
-}
-
-#custom-updates.pending {
-  color: #a2efcc;
-}
-
-#custom-cliphist.empty,
-#custom-cliphist.missing {
-  color: #9ba4af;
-}
-
-#custom-cliphist.overflow {
-  color: #f7dc98;
-}
-
-#custom-tailscale.connected {
-  color: #9ee6b9;
-}
-
-#custom-tailscale.degraded {
-  color: #f4d18b;
-}
-
-#custom-tailscale.offline {
-  color: #ff9da8;
-}
-
-#custom-tailscale.missing {
-  color: #9ba4af;
-}
-
-#idle_inhibitor.activated {
-  color: #a6e3a1;
-}
-
-#custom-mpris {
-  color: #d0d8ff;
+#window {
+  padding: 0 10px;
+  color: @muted;
   font-weight: 600;
 }
 
-#custom-mpris.playing,
-#custom-mpris.paused {
-  border-right: 1px solid rgba(255, 255, 255, 0.18);
+#privacy,
+#submap,
+#systemd-failed-units,
+#network,
+#idle_inhibitor,
+#wireplumber,
+#tray,
+#clock,
+#custom-cliphist,
+#custom-mpris,
+#custom-tailscale,
+#custom-updates,
+#custom-cpu,
+#custom-gpu,
+#custom-memory {
+  margin: 0;
+  padding: 0 9px;
+  border-radius: 0;
+  color: @foreground;
+  background: transparent;
 }
 
+#custom-cpu,
+#custom-gpu,
+#hardware,
+#connectivity,
+#controls,
+#tray,
+#clock {
+  border-right: 1px solid @divider;
+  border-radius: 0;
+}
+
+#hardware { margin-right: 5px; }
+
+#custom-mpris { padding-left: 10px; }
+
+#clock {
+  color: @foreground;
+  font-weight: 700;
+}
+
+#custom-mpris { color: #b4c6ff; }
+
 #custom-mpris.stopped {
+  min-width: 0;
   padding-left: 0;
   padding-right: 0;
   border-right: none;
-  min-width: 0;
 }
 
-#idle_inhibitor {
-  font-weight: 600;
-}
+#custom-tailscale.connected,
+#idle_inhibitor.activated { color: @green; }
 
-#idle_inhibitor.deactivated {
-  color: #ffb0b8;
-}
+#custom-updates.pending,
+#custom-tailscale.degraded,
+#custom-cliphist.overflow { color: @yellow; }
 
-#privacy-item.audio-in {
-  color: #ff9da8;
-}
+#network.disconnected,
+#custom-tailscale.offline,
+#systemd-failed-units.degraded { color: @red; }
 
-#privacy-item.audio-out {
-  color: #9bd5ff;
-}
+#custom-tailscale.missing,
+#custom-cliphist.empty,
+#custom-cliphist.missing,
+#custom-cpu.offline,
+#custom-gpu.offline,
+#custom-memory.offline,
+#idle_inhibitor.deactivated { color: @muted; }
 
-#privacy-item.screenshare {
-  color: #ffd88a;
-}
+#submap { color: @accent; }
+
+#privacy-item.audio-in { color: @red; }
+#privacy-item.audio-out { color: @accent; }
+#privacy-item.screenshare { color: @yellow; }
 
 #custom-cpu.cool,
 #custom-gpu.cool,
-#custom-memory.cool {
-  color: #c9e9ff;
-}
+#custom-memory.cool { color: @accent; }
 
 #custom-cpu.warm,
 #custom-gpu.warm,
-#custom-memory.warm {
-  color: #f7dc98;
-}
+#custom-memory.warm { color: @yellow; }
 
 #custom-cpu.hot,
 #custom-gpu.hot,
-#custom-memory.hot {
-  color: #ffba7a;
-}
+#custom-memory.hot { color: @orange; }
 
 #custom-cpu.critical,
 #custom-gpu.critical,
-#custom-memory.critical {
-  color: #ff8b8b;
-}
-
-#custom-gpu.offline {
-  color: #9ba4af;
-}
+#custom-memory.critical { color: @red; }

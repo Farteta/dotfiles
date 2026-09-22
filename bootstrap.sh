@@ -7,15 +7,17 @@ TARGET_HOME="${HOME}"
 INSTALL_PACKAGES=1
 ENABLE_SERVICES=1
 DEPLOY_SDDM=1
+INSTALL_HYPR_PLUGINS=1
 
 for arg in "$@"; do
   case "$arg" in
     --no-packages) INSTALL_PACKAGES=0 ;;
     --no-services) ENABLE_SERVICES=0 ;;
     --no-sddm) DEPLOY_SDDM=0 ;;
+    --no-hypr-plugins) INSTALL_HYPR_PLUGINS=0 ;;
     *)
       echo "Unknown flag: $arg"
-      echo "Usage: $0 [--no-packages] [--no-services] [--no-sddm]"
+      echo "Usage: $0 [--no-packages] [--no-services] [--no-sddm] [--no-hypr-plugins]"
       exit 2
       ;;
   esac
@@ -37,6 +39,47 @@ backup_target() {
   mv "${target}" "${backup_path}"
   BACKUP_CREATED=1
   echo "Backed up ${target} -> ${backup_path}"
+}
+
+install_hypr_edgehover() {
+  local plugin_name="hypr-edgehover"
+  local plugin_repo="https://github.com/gfhdhytghd/hypr-edgehover"
+  local needs_add=1
+
+  if ! command -v hyprpm >/dev/null 2>&1; then
+    echo "hyprpm not found; skipping ${plugin_name} install"
+    return
+  fi
+
+  hyprpm update || {
+    echo "Failed to update Hyprland plugin headers; run: hyprpm update"
+    return
+  }
+
+  if hyprpm list 2>/dev/null | grep -Fq "${plugin_name}"; then
+    needs_add=0
+  fi
+
+  if [[ "${needs_add}" -eq 1 ]]; then
+    hyprpm add "${plugin_repo}" || {
+      echo "Failed to add ${plugin_name}; run: hyprpm add ${plugin_repo}"
+      return
+    }
+  fi
+
+  hyprpm enable "${plugin_name}" || {
+    echo "Failed to enable ${plugin_name}; run: hyprpm enable ${plugin_name}"
+    return
+  }
+
+  hyprpm update || {
+    echo "Failed to update Hyprland plugins; run: hyprpm update"
+    return
+  }
+
+  hyprpm reload || {
+    echo "Failed to reload Hyprland plugins; restart Hyprland or run: hyprpm reload"
+  }
 }
 
 prepare_stow_package() {
@@ -74,8 +117,11 @@ prepare_stow_package() {
 }
 
 PACKAGES=(
+  base-devel
+  git
   stow
   hyprland
+  hyprpm
   hyprpaper
   hyprlock
   hypridle
@@ -111,11 +157,12 @@ STOW_PACKAGES=(
   desktop
   hypr
   kitty
+  rofi
   waybar
   zsh
 )
 
-echo "[1/5] Installing packages"
+echo "[1/6] Installing packages"
 if [[ "$INSTALL_PACKAGES" -eq 1 ]]; then
   if command -v pacman >/dev/null 2>&1; then
     sudo pacman -S --needed "${PACKAGES[@]}"
@@ -126,7 +173,7 @@ else
   echo "Skipping package installation (--no-packages)"
 fi
 
-echo "[2/5] Stowing dotfiles into ${TARGET_HOME}"
+echo "[2/6] Stowing dotfiles into ${TARGET_HOME}"
 if ! command -v stow >/dev/null 2>&1; then
   echo "GNU stow is required. Install it first."
   exit 1
@@ -142,26 +189,33 @@ if [[ "${BACKUP_CREATED}" -eq 1 ]]; then
   echo "Existing files were backed up under ${BACKUP_ROOT}"
 fi
 
-echo "[3/5] Deploying SDDM theme (requires sudo)"
+echo "[3/6] Deploying SDDM theme (requires sudo)"
 if [[ "${DEPLOY_SDDM}" -eq 1 && -f "${REPO_DIR}/sddm/install.sh" ]]; then
   sudo "${REPO_DIR}/sddm/install.sh"
 elif [[ "${DEPLOY_SDDM}" -eq 0 ]]; then
   echo "Skipping SDDM deploy (--no-sddm)"
 fi
 
-echo "[4/5] Ensuring Hyprland host override file exists"
-HOST_TEMPLATE="${REPO_DIR}/hypr/.config/hypr/host.local.conf.example"
-HOST_LOCAL="${TARGET_HOME}/.config/hypr/host.local.conf"
+echo "[4/6] Ensuring Hyprland host override file exists"
+HOST_TEMPLATE="${REPO_DIR}/hypr/.config/hypr/host.lua.example"
+HOST_LOCAL="${TARGET_HOME}/.config/hypr/host.lua"
 if [[ ! -f "${HOST_LOCAL}" ]]; then
   install -Dm644 "${HOST_TEMPLATE}" "${HOST_LOCAL}"
   {
     echo
-    echo "# Hostname: $(hostname -s)"
+    echo "-- Hostname: $(hostname -s)"
   } >> "${HOST_LOCAL}"
   echo "Created ${HOST_LOCAL}"
 fi
 
-echo "[5/5] Enabling services"
+echo "[5/6] Installing Hyprland plugins"
+if [[ "${INSTALL_HYPR_PLUGINS}" -eq 1 ]]; then
+  install_hypr_edgehover
+else
+  echo "Skipping Hyprland plugins (--no-hypr-plugins)"
+fi
+
+echo "[6/6] Enabling services"
 if [[ "$ENABLE_SERVICES" -eq 1 ]]; then
   if command -v systemctl >/dev/null 2>&1; then
     sudo systemctl enable --now NetworkManager.service || true

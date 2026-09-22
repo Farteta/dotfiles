@@ -19,7 +19,7 @@ $1 == "SwapFree:" { swap_free = $2 }
 
 END {
   if (!mem_total) {
-    print "{\"text\":\"ram n/a\",\"tooltip\":\"memory stats unavailable\",\"class\":\"offline\"}"
+    print "{\"text\":\"<span size=\\u0027125%\\u0027></span> n/a\",\"tooltip\":\"memory stats unavailable\",\"class\":\"offline\"}"
     exit 0
   }
 
@@ -37,7 +37,7 @@ END {
     swap_pct = 0
   }
 
-  printf("{\"text\":\"ram  %d%%\",\"tooltip\":\"RAM\\nUsed: %.1f GiB / %.1f GiB (%d%%)\\nAvail: %.1f GiB\\nSwap: %.1f GiB / %.1f GiB (%d%%)\",\"class\":\"%s\"}\n",
+  printf("{\"text\":\"<span size=\\u0027125%%\\u0027></span> %d%%\",\"tooltip\":\"RAM\\nUsed: %.1f GiB / %.1f GiB (%d%%)\\nAvail: %.1f GiB\\nSwap: %.1f GiB / %.1f GiB (%d%%)\\nClick: open btop\",\"class\":\"%s\"}\n",
     mem_pct,
     mem_used / 1048576,
     mem_total / 1048576,

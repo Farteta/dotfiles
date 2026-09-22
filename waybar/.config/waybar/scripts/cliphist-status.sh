@@ -4,7 +4,7 @@ set -eu
 max_items=10
 
 if ! command -v cliphist >/dev/null 2>&1; then
-  printf '{"text":"clip n/a","tooltip":"cliphist not installed","class":"missing"}\n'
+  printf '{"text":"<span size=\u0027125%%\u0027></span>","tooltip":"cliphist not installed","class":"missing"}\n'
   exit 0
 fi
 
@@ -23,4 +23,4 @@ elif [ "$count" -gt "$max_items" ]; then
   class="overflow"
 fi
 
-printf '{"text":"clip ","tooltip":"%s","class":"%s"}\n' "$tooltip" "$class"
+printf '{"text":"<span size=\u0027125%%\u0027></span>","tooltip":"%s","class":"%s"}\n' "$tooltip" "$class"

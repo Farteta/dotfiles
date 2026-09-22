@@ -1,6 +1,6 @@
 # dotfiles
 
-Personal dotfiles for Arch Linux with Hyprland, Waybar, SDDM, Kitty, and Zsh.
+Personal dotfiles for Arch Linux with Hyprland, Waybar, Rofi, SDDM, Kitty, and Zsh.
 
 ## Layout
 
@@ -8,6 +8,7 @@ Personal dotfiles for Arch Linux with Hyprland, Waybar, SDDM, Kitty, and Zsh.
 - `hypr/` -> Hyprland, hyprpaper, hyprlock, hypridle, mako, portal config
 - `waybar/` -> Waybar config, style, helper scripts
 - `kitty/` -> Kitty terminal config
+- `rofi/` -> Rofi application, command, and window launcher
 - `sddm/` -> Custom SDDM login theme (hypr-dark) + install script
 - `zsh/` -> Zsh and Powerlevel10k config
 - `pkglist.txt` -> package snapshot reference
@@ -20,15 +21,15 @@ cd ~/dotfiles
 ./bootstrap.sh
 ```
 
-`bootstrap.sh` installs packages, backs up existing files that conflict with stow targets, stows configs, deploys the SDDM theme, creates a host override file for Hyprland, and enables key services.
+`bootstrap.sh` installs packages, backs up existing files that conflict with stow targets, stows configs, deploys the SDDM theme, creates a host override file for Hyprland, installs Hyprland plugins with `hyprpm`, and enables key services.
 
-Existing conflicting files are moved under `~/.local/state/dotfiles-backups/bootstrap-*` before stow runs. Use `--no-packages`, `--no-services`, or `--no-sddm` to skip those bootstrap phases.
+Existing conflicting files are moved under `~/.local/state/dotfiles-backups/bootstrap-*` before stow runs. Use `--no-packages`, `--no-services`, `--no-sddm`, or `--no-hypr-plugins` to skip those bootstrap phases.
 
 ## Manual Stow
 
 ```bash
 cd ~/dotfiles
-stow -t ~ desktop hypr kitty waybar zsh
+stow -t ~ desktop hypr kitty rofi waybar zsh
 ```
 
 ### Kitty Linux overrides
@@ -55,17 +56,93 @@ What `sddm/install.sh` does:
 
 Edit `sddm/themes/hypr-dark/theme.conf` to change the wallpaper path or accent colour.
 
+## Hyprland Lua Configuration
+
+`hyprland.lua` is the entry point. The configuration is split into focused
+modules under `~/.config/hypr/config/` for monitors, environment, autostart,
+plugins, appearance, layouts, input, bindings, and window rules.
+
+The previous `hyprland.conf` remains in the repository as a rollback reference
+during the migration and is ignored whenever `hyprland.lua` is present.
+
 ## Host Overrides (Hyprland)
 
-Main config sources:
+Machine-specific settings are loaded from:
 
-- `~/.config/hypr/host.local.conf`
+- `~/.config/hypr/host.lua`
 
-Use this file for machine-specific overrides like monitor layout/scale, device-specific input settings, etc.
+The LG C5's everyday 4K/144 Hz, scale-2, 8-bit SDR profile now lives in
+`hypr/.config/hypr/config/monitors/lg_c5.lua`. Use `host.lua` only for overrides
+that should not be committed to the dotfiles.
 
 Template location in repo:
 
-- `hypr/.config/hypr/host.local.conf.example`
+- `hypr/.config/hypr/host.lua.example`
+
+### Scrolling layout and keyboard modes
+
+Scrolling is the global tiling layout (not assigned to particular workspaces).
+The most useful bindings are:
+
+| Keys | Action |
+| --- | --- |
+| `Super` + `Left` / `Right` | Focus the previous / next column |
+| `Super` + `Alt` + `Left` / `Right` | Scroll the viewport by one column |
+| `Super` + `Alt` + `Up` / `Down` | Make the focused column wider / narrower |
+| `Super` + `Shift` + `Left` / `Right` | Swap the focused column with its neighbor |
+| `Super` + `Alt` + `C` | Center the focused column |
+| `Super` + `J` | Move a window into the next column, or back out |
+| `Super` + `Shift` + `J` | Give the focused window its own column |
+
+`Super` + `Shift` + `R` enters **resize mode**: arrow keys or `H/J/K/L` resize
+the focused window in 20-pixel steps. `Super` + `G` enters **groups mode**:
+`G` creates/toggles a tabbed group, `H/L` moves a window into a neighboring
+group, `N/P` changes group tab, `U` removes a window from its group, and `K`
+locks/unlocks the active group. In either mode, `Escape` or `Return` exits;
+Waybar displays the active mode. If a mode ever gets stuck, run
+`hyprctl dispatch 'hl.dsp.submap("reset")'` in a terminal.
+
+Smart gaps remove gaps, borders, and rounding when an ordinary workspace has
+one visible tiled window or a maximized window. Special workspaces keep their
+normal appearance.
+
+### LG C5 color experiments
+
+The regular profile remains 8-bit SDR. To briefly test a single change from a
+terminal, run one of these commands:
+
+```sh
+~/.config/hypr/scripts/lg-c5-display-test.sh 10bit 20
+~/.config/hypr/scripts/lg-c5-display-test.sh hdr 20
+```
+
+The first keeps sRGB/SDR and tests only 10-bit output. The second tests 10-bit
+HDR. Each automatically restores the normal profile after 20 seconds via a
+Hyprland reload, so wait if the TV briefly loses signal. HDR is experimental;
+judge it on the TV itself, since screenshots cannot establish how its panel
+looks. Leave the regular profile in place until the picture and relevant apps
+have been checked in person.
+
+## Midnight Aurora Theme
+
+The desktop uses a shared dark palette chosen to match the blue/cyan wallpaper:
+
+- background: `#11141c`
+- surface: `#191d27`
+- foreground: `#e6eaf2`
+- muted text: `#929cad`
+- accent: `#7dcfff`
+- success: `#9ece6a`
+- warning: `#e0af68`
+- error: `#f7768e`
+
+Matching colors are applied to Hyprland, Waybar, Rofi, Kitty, Mako,
+Hyprlock, and the custom SDDM theme. When changing the palette, keep the
+semantic roles consistent so states remain recognizable across the desktop.
+
+## Hyprland Plugins
+
+`bootstrap.sh` installs and enables [`hypr-edgehover`](https://github.com/gfhdhytghd/hypr-edgehover) through `hyprpm`. The Hyprland config runs `hyprpm reload -n` on startup so enabled plugins load automatically.
 
 ## Update Flow
 
@@ -74,3 +151,18 @@ cd ~/dotfiles
 git pull --rebase
 ./bootstrap.sh
 ```
+
+## Recovery
+
+On a Btrfs installation, `sudo ./recovery/setup-snapshots.sh` creates a root
+Snapper configuration, a first read-only snapshot, and enables the timeline and
+cleanup timers. It keeps a small rolling history (2 hourly, 5 daily, 1 weekly)
+and leaves any existing root Snapper configuration untouched. Inspect snapshots
+with `sudo snapper -c root list` and timer status with
+`systemctl status snapper-timeline.timer snapper-cleanup.timer`.
+
+The root snapshot does **not** include the separate `/home` Btrfs subvolume or
+the `/boot` EFI partition. With systemd-boot, it is not an automatic boot-menu
+rollback. Keep an independent backup of personal files and a recovery USB;
+snapshots on the same SSD cannot protect against drive failure. The external
+backup destination is intentionally not configured by this script.

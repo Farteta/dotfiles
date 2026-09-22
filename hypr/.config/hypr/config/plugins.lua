@@ -1,0 +1,4 @@
+-- hyprpm loads hypr-edgehover during session startup. All values from the
+-- previous config matched the plugin's defaults, so no early plugin options
+-- are needed here. Keeping this module makes the load order explicit and gives
+-- future non-default plugin settings a dedicated home.

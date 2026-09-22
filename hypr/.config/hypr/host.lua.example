@@ -1,0 +1,5 @@
+-- Machine-specific settings. bootstrap.sh copies this to:
+-- ~/.config/hypr/host.lua
+
+-- The LG C5 profile now lives in config/monitors/lg_c5.lua.
+-- Add only machine-local overrides here if needed.

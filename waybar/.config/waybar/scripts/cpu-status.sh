@@ -80,5 +80,5 @@ usage="$(cpu_usage_percent)"
 temp="$(cpu_temp_c)"
 class="$(temp_class "$temp")"
 
-printf '{"text":"cpu  %s%%  %s°C","tooltip":"CPU\\nUsage: %s%%\\nTemp: %s°C","class":"%s"}\n' \
+printf '{"text":"<span size=\u0027125%%\u0027></span> %s%% %s°C","tooltip":"CPU\\nUsage: %s%%\\nTemp: %s°C\\nClick: open btop","class":"%s"}\n' \
   "$usage" "$temp" "$usage" "$temp" "$class"

@@ -8,19 +8,21 @@ print_json() {
   printf '{"text":"%s","tooltip":"%s","class":"%s"}\n' "$text" "$tooltip" "$class"
 }
 
+tailscale_icon="<span size='125%'>󰒍</span>"
+
 if ! command -v tailscale >/dev/null 2>&1; then
-  print_json "ts n/a" "tailscale not installed" "missing"
+  print_json "$tailscale_icon n/a" "tailscale not installed" "missing"
   exit 0
 fi
 
 if ! command -v jq >/dev/null 2>&1; then
-  print_json "ts n/a" "jq is required for tailscale parsing" "missing"
+  print_json "$tailscale_icon n/a" "jq is required for tailscale parsing" "missing"
   exit 0
 fi
 
 status_json="$(timeout 3 tailscale status --json 2>/dev/null || true)"
 if [ -z "$status_json" ]; then
-  print_json "ts off" "tailscale daemon unreachable" "offline"
+  print_json "$tailscale_icon ×" "tailscale daemon unreachable" "offline"
   exit 0
 fi
 
@@ -36,11 +38,11 @@ host_safe=$(printf '%s' "$host" | tr '"' "'")
 ip_safe=$(printf '%s' "$ip" | tr '"' "'")
 
 class="offline"
-text="ts off"
+text="$tailscale_icon ×"
 
 if [ "$state" = "Running" ] && [ "$self_online" = "true" ]; then
   class="connected"
-  text="ts ${online_peers}"
+  text="$tailscale_icon ${online_peers}"
 fi
 
 if [ "$health_count" -gt 0 ] && [ "$class" = "connected" ]; then

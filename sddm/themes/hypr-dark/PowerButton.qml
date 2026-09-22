@@ -8,10 +8,12 @@ Item {
     property string fontFamily: ""
     property color accentColor: "#87b8ff"
     property color textColor: Qt.rgba(1, 1, 1, 0.6)
+    property int cornerRadius: 18
+    property real preferredWidth: 0
 
     signal clicked()
 
-    width: col.implicitWidth + 22
+    width: preferredWidth > 0 ? preferredWidth : col.implicitWidth + 22
     height: col.implicitHeight + 14
     opacity: enabled ? (mouseArea.containsMouse ? 1.0 : 0.8) : 0.3
 
@@ -19,7 +21,7 @@ Item {
 
     Rectangle {
         anchors.fill: parent
-        radius: 16
+        radius: btn.cornerRadius
         color: mouseArea.containsMouse
                ? Qt.rgba(btn.accentColor.r, btn.accentColor.g, btn.accentColor.b, 0.10)
                : Qt.rgba(1, 1, 1, 0.03)
@@ -39,7 +41,7 @@ Item {
 
         Rectangle {
             anchors.horizontalCenter: parent.horizontalCenter
-            width: 38; height: 38
+            width: 34; height: 34
             radius: width / 2
             color: mouseArea.containsMouse
                    ? Qt.rgba(btn.accentColor.r, btn.accentColor.g, btn.accentColor.b, 0.12)
@@ -51,7 +53,7 @@ Item {
                 anchors.centerIn: parent
                 text: btn.icon
                 font.family: btn.fontFamily
-                font.pixelSize: 17
+                font.pixelSize: 16
                 color: mouseArea.containsMouse ? btn.accentColor : btn.textColor
 
                 Behavior on color { ColorAnimation { duration: 150 } }

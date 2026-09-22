@@ -2,34 +2,53 @@
   "layer": "top",
   "position": "top",
   "height": 34,
-  "spacing": 4,
+  "spacing": 0,
   "modules-left": [
-    "hyprland/workspaces",
-    "custom/cpu",
-    "custom/gpu",
-    "custom/memory",
-    "custom/cliphist",
+    "ext/workspaces",
+    "group/hardware",
     "custom/mpris"
   ],
   "modules-center": [
     "hyprland/window"
   ],
   "modules-right": [
+    "hyprland/submap",
+    "systemd-failed-units",
     "privacy",
-    "backlight",
-    "network",
-    "custom/tailscale",
-    "idle_inhibitor",
-    "wireplumber",
+    "group/connectivity",
+    "group/controls",
     "tray",
     "clock",
     "custom/updates"
   ],
-  "hyprland/workspaces": {
-    "format": "{id}",
-    "show-special": true,
+  "group/connectivity": {
+    "orientation": "horizontal",
+    "modules": [
+      "network",
+      "custom/tailscale"
+    ]
+  },
+  "group/hardware": {
+    "orientation": "horizontal",
+    "modules": [
+      "custom/cpu",
+      "custom/gpu",
+      "custom/memory"
+    ]
+  },
+  "group/controls": {
+    "orientation": "horizontal",
+    "modules": [
+      "idle_inhibitor",
+      "wireplumber",
+      "custom/cliphist"
+    ]
+  },
+  "ext/workspaces": {
+    "format": "{name}",
     "all-outputs": true,
-    "sort-by": "number"
+    "sort-by-name": true,
+    "on-click": "activate"
   },
   "hyprland/window": {
     "format": "{class}",
@@ -40,6 +59,18 @@
       "^org\\.freedesktop\\.impl\\.portal\\.desktop\\.kde$": "File Picker",
       "^org\\.kde\\.(.*)$": "$1"
     }
+  },
+  "hyprland/submap": {
+    "format": "<span size='125%'>󰌌</span> {}",
+    "max-length": 14,
+    "tooltip": false,
+    "always-on": false
+  },
+  "systemd-failed-units": {
+    "format": "<span size='125%'></span> {nr_failed}",
+    "hide-on-ok": true,
+    "system": true,
+    "user": true
   },
   "custom/cliphist": {
     "exec": "~/.config/waybar/scripts/cliphist-status.sh",
@@ -57,7 +88,7 @@
       ""
     ],
     "tooltip": true,
-    "tooltip-format": "{node_name}\n{volume}%",
+    "tooltip-format": "Output: {node_name}\nVolume: {volume}%\nClick: sound settings · Scroll: adjust volume",
     "scroll-step": 5,
     "on-click": "~/.config/waybar/scripts/toggle-panel.sh volume"
   },
@@ -69,7 +100,7 @@
     "on-scroll-down": "brightnessctl -q set 5%-"
   },
   "custom/mpris": {
-    "exec": "~/.config/waybar/scripts/mpris-scroll.sh 36 0.12 4 6",
+    "exec": "~/.config/waybar/scripts/mpris-scroll.sh 36 0.8 1 3",
     "return-type": "json",
     "tooltip": true,
     "hide-empty-text": true,
@@ -80,7 +111,7 @@
     "on-click-right": "playerctl next"
   },
   "privacy": {
-    "icon-size": 18,
+    "icon-size": 20,
     "icon-spacing": 5,
     "transition-duration": 200,
     "ignore-monitor": false,
@@ -103,30 +134,32 @@
     ]
   },
   "idle_inhibitor": {
-    "format": "idle {icon}",
+    "format": "<span size='130%'>{icon}</span>",
     "format-icons": {
-      "activated": "on ",
-      "deactivated": "off "
+      "activated": "",
+      "deactivated": ""
     },
-    "tooltip-format-activated": "idle inhibit: on",
-    "tooltip-format-deactivated": "idle inhibit: off"
+    "tooltip-format-activated": "Keep awake is on\nClick to allow sleep and screen lock",
+    "tooltip-format-deactivated": "Normal sleep and screen lock\nClick to keep the screen awake"
   },
   "network": {
+    "interface": "eno1",
     "interval": 2,
     "tooltip": true,
-    "format-wifi": "net  ↓{bandwidthDownBits} ↑{bandwidthUpBits}",
-    "format-ethernet": "net  ↓{bandwidthDownBits} ↑{bandwidthUpBits}",
-    "format-linked": "lan linked",
-    "format-disconnected": "net down",
-    "tooltip-format-wifi": "{ifname} {essid}\\n{ipaddr}\\n↓ {bandwidthDownBits}\\n↑ {bandwidthUpBits}",
-    "tooltip-format-ethernet": "{ifname} {ipaddr}\\n↓ {bandwidthDownBits}\\n↑ {bandwidthUpBits}",
-    "tooltip-format-disconnected": "disconnected",
-    "max-length": 34,
+    "format-wifi": "<span size='125%'></span> ↓{bandwidthDownBits} ↑{bandwidthUpBits}",
+    "format-ethernet": "<span size='125%'></span> ↓{bandwidthDownBits} ↑{bandwidthUpBits}",
+    "format-linked": "<span size='125%'></span> linked",
+    "format-disconnected": "<span size='125%'>󰖪</span>",
+    "tooltip-format-wifi": "Wi-Fi: {essid}\nInterface: {ifname}\nLocal IP: {ipaddr}\nDownload: {bandwidthDownBits}\nUpload: {bandwidthUpBits}\nClick: network settings",
+    "tooltip-format-ethernet": "Wired connection\nInterface: {ifname}\nLocal IP: {ipaddr}\nDownload: {bandwidthDownBits}\nUpload: {bandwidthUpBits}\nClick: network settings",
+    "tooltip-format-disconnected": "Network disconnected\nClick to open network settings",
+    "max-length": 30,
     "on-click": "~/.config/waybar/scripts/toggle-panel.sh network"
   },
   "custom/updates": {
     "exec": "~/.config/waybar/scripts/updates-count.sh",
     "return-type": "json",
+    "hide-empty-text": true,
     "tooltip": true,
     "interval": 900
   },
@@ -165,7 +198,7 @@
     "tooltip-format": "<tt>{calendar}</tt>"
   },
   "tray": {
-    "icon-size": 18,
+    "icon-size": 19,
     "spacing": 6
   }
 }
